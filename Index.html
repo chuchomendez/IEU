@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Directrices para Estructurar Información · ABI</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Lora:ital,wght@0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --orange:#F47920;
+  --orange-dark:#D45F0A;
+  --orange-glow:#FDEEDD;
+  --white:#FFFFFF;
+  --ink:#1C1C1E;
+  --ink-soft:#6B6B78;
+  --surface:#F6F6F9;
+  --border:rgba(0,0,0,0.09);
+  --success:#1A7A45;
+  --success-soft:#E2F5EB;
+  --danger:#C0392B;
+  --danger-soft:#FDECEA;
+  --shadow:0 2px 16px rgba(0,0,0,0.08);
+  --shadow-md:0 4px 28px rgba(0,0,0,0.12);
+}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;background:var(--surface);color:var(--ink);}
+
+/* ── Header ── */
+#header{
+  position:fixed;top:0;left:0;right:0;z-index:100;
+  background:var(--orange);
+  padding:0 24px;
+  height:56px;
+  display:flex;align-items:center;justify-content:space-between;
+  box-shadow:0 2px 12px rgba(244,121,32,0.35);
+}
+#header-left{display:flex;align-items:center;gap:14px;}
+#header-logo{
+  width:34px;height:34px;border-radius:8px;
+  background:rgba(255,255,255,0.2);
+  display:flex;align-items:center;justify-content:center;
+  font-weight:800;font-size:16px;color:#fff;letter-spacing:-.5px;
+}
+#header-title{color:#fff;font-size:13.5px;font-weight:600;line-height:1.2;max-width:240px;}
+#header-title span{display:block;font-weight:400;font-size:11.5px;opacity:.75;margin-top:1px;}
+#station-label{
+  color:rgba(255,255,255,0.85);font-size:12px;font-weight:500;
+  background:rgba(255,255,255,0.15);padding:4px 12px;border-radius:20px;
+  white-space:nowrap;
+}
+
+/* ── Progress bar ── */
+#progress-bar{
+  position:fixed;top:56px;left:0;right:0;z-index:99;
+  height:4px;background:rgba(244,121,32,0.15);
+}
+#progress-fill{height:100%;background:var(--orange);transition:width .4s ease;width:0%;}
+
+/* ── Sidebar ── */
+#sidebar{
+  position:fixed;left:0;top:60px;bottom:0;width:220px;
+  background:#fff;border-right:1px solid var(--border);
+  padding:20px 0;overflow-y:auto;z-index:90;
+  transform:translateX(-100%);transition:transform .3s ease;
+}
+#sidebar.open{transform:none;}
+.sidebar-station{
+  padding:9px 20px;font-size:12.5px;cursor:pointer;
+  display:flex;align-items:center;gap:10px;
+  color:var(--ink-soft);border-left:3px solid transparent;
+  transition:all .15s;
+}
+.sidebar-station.active{color:var(--orange);border-left-color:var(--orange);background:var(--orange-glow);font-weight:600;}
+.sidebar-station:hover:not(.active){background:var(--surface);}
+.sidebar-icon{font-size:15px;width:18px;text-align:center;}
+#menu-btn{
+  background:none;border:none;cursor:pointer;padding:6px;color:#fff;font-size:20px;line-height:1;
+}
+
+/* ── Main content area ── */
+#main{
+  position:fixed;top:60px;left:0;right:0;bottom:60px;
+  overflow:hidden;
+}
+.station{
+  position:absolute;inset:0;
+  overflow-y:auto;padding:32px 24px 20px;
+  opacity:0;pointer-events:none;transition:opacity .3s ease,transform .3s ease;
+  transform:translateX(40px);
+}
+.station.active{opacity:1;pointer-events:all;transform:none;}
+.station.prev{opacity:0;transform:translateX(-40px);}
+.content-wrap{max-width:760px;margin:0 auto;}
+
+/* ── Bottom nav ── */
+#bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;height:60px;
+  background:#fff;border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 24px;z-index:100;
+}
+.nav-btn{
+  padding:10px 24px;border-radius:10px;border:none;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;font-weight:600;
+  transition:all .15s;
+}
+#btn-prev{background:var(--surface);color:var(--ink-soft);}
+#btn-prev:hover{background:#eaeaef;}
+#btn-next{background:var(--orange);color:#fff;box-shadow:0 4px 14px rgba(244,121,32,0.35);}
+#btn-next:hover{background:var(--orange-dark);}
+#btn-next:disabled{opacity:.4;cursor:not-allowed;box-shadow:none;}
+#nav-counter{font-size:12.5px;color:var(--ink-soft);font-weight:500;}
+
+/* ── Typography ── */
+.station-eyebrow{
+  font-size:11px;font-weight:700;letter-spacing:.1em;color:var(--orange);
+  text-transform:uppercase;margin-bottom:12px;
+}
+.station-title{
+  font-size:clamp(22px,4vw,34px);font-weight:800;line-height:1.15;
+  margin-bottom:16px;letter-spacing:-.5px;
+}
+.station-subtitle{
+  font-family:'Lora',serif;font-size:17px;color:var(--ink-soft);
+  line-height:1.65;margin-bottom:28px;font-style:italic;
+}
+.lede{
+  font-size:15.5px;line-height:1.7;color:var(--ink-soft);margin-bottom:20px;
+}
+h3.sub{font-size:15px;font-weight:700;margin-bottom:10px;color:var(--ink);}
+
+/* ── Cards ── */
+.card{
+  background:#fff;border:1px solid var(--border);border-radius:16px;
+  padding:22px 24px;box-shadow:var(--shadow);
+}
+.card+.card{margin-top:14px;}
+.card-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+@media(max-width:600px){.card-grid{grid-template-columns:1fr;}}
+
+/* ── Big question box ── */
+.question-box{
+  border:2.5px solid var(--orange);border-radius:16px;padding:28px;
+  background:var(--orange-glow);margin-bottom:24px;text-align:center;
+}
+.question-box .q-label{font-size:11px;font-weight:700;letter-spacing:.12em;color:var(--orange);text-transform:uppercase;margin-bottom:10px;}
+.question-box .q-text{
+  font-family:'Lora',serif;font-size:clamp(18px,3vw,26px);
+  font-weight:500;color:var(--ink);line-height:1.35;
+}
+
+/* ── Step reveal ── */
+.step-ladder{display:flex;flex-direction:column;gap:0;}
+.step-item{
+  border-radius:14px;padding:18px 22px;margin-bottom:8px;
+  border:2px solid transparent;cursor:pointer;transition:all .25s;
+  background:#fff;box-shadow:var(--shadow);
+  display:flex;align-items:flex-start;gap:16px;
+}
+.step-item.locked{opacity:.35;filter:grayscale(.8);cursor:not-allowed;}
+.step-item.unlocked:hover{transform:translateX(4px);}
+.step-item.active{border-color:var(--orange);background:var(--orange-glow);}
+.step-badge{
+  min-width:42px;height:42px;border-radius:10px;
+  background:var(--surface);display:flex;align-items:center;justify-content:center;
+  font-size:18px;font-weight:800;color:var(--orange-dark);flex-shrink:0;
+  transition:background .25s;
+}
+.step-item.active .step-badge{background:var(--orange);color:#fff;}
+.step-content .step-title{font-weight:700;font-size:15.5px;margin-bottom:4px;}
+.step-content .step-body{font-size:14px;color:var(--ink-soft);line-height:1.6;}
+.step-example{
+  margin-top:8px;padding:10px 14px;border-radius:10px;background:rgba(244,121,32,0.12);
+  font-family:'Lora',serif;font-size:14px;font-style:italic;color:var(--ink);line-height:1.5;
+  display:none;
+}
+.step-item.active .step-example{display:block;}
+
+/* ── 5 Filtros ── */
+.filter-list{display:flex;flex-direction:column;gap:10px;margin-bottom:24px;}
+.filter-item{
+  display:flex;align-items:center;gap:14px;
+  background:#fff;border:2px solid var(--border);border-radius:12px;padding:14px 18px;
+  cursor:pointer;transition:all .2s;
+}
+.filter-item:hover{border-color:var(--orange);}
+.filter-item.checked{border-color:var(--success);background:var(--success-soft);}
+.filter-check{
+  width:26px;height:26px;border-radius:8px;border:2px solid var(--border);
+  flex-shrink:0;display:flex;align-items:center;justify-content:center;
+  font-size:14px;transition:all .2s;background:#fff;
+}
+.filter-item.checked .filter-check{background:var(--success);border-color:var(--success);color:#fff;}
+.filter-text{font-size:14.5px;font-weight:500;}
+.filter-text small{display:block;font-weight:400;font-size:12.5px;color:var(--ink-soft);margin-top:2px;}
+
+/* ── Source compare ── */
+.source-pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:20px;}
+@media(max-width:580px){.source-pair{grid-template-columns:1fr;}}
+.source-card{
+  background:#fff;border:2px solid var(--border);border-radius:14px;padding:20px;
+  transition:all .25s;
+}
+.source-card.good{border-color:var(--success);background:var(--success-soft);}
+.source-card.bad{border-color:var(--danger);background:var(--danger-soft);}
+.source-tag{
+  display:inline-block;font-size:11px;font-weight:700;letter-spacing:.06em;
+  padding:3px 10px;border-radius:20px;margin-bottom:12px;text-transform:uppercase;
+}
+.source-tag.a{background:var(--orange-glow);color:var(--orange-dark);}
+.source-tag.b{background:var(--surface);color:var(--ink-soft);}
+.source-card.good .source-tag.a{background:rgba(26,122,69,.12);color:var(--success);}
+.source-card.bad .source-tag.b{background:rgba(192,57,43,.12);color:var(--danger);}
+.source-title{font-weight:700;font-size:14.5px;margin-bottom:8px;line-height:1.3;}
+.source-meta{font-size:12.5px;color:var(--ink-soft);line-height:1.7;}
+.source-verdict{
+  margin-top:12px;padding:8px 12px;border-radius:8px;
+  font-size:12.5px;font-weight:600;display:none;
+}
+.source-card.good .source-verdict{display:block;background:rgba(26,122,69,.15);color:var(--success);}
+.source-card.bad .source-verdict{display:block;background:rgba(192,57,43,.15);color:var(--danger);}
+#evaluate-btn{
+  display:block;width:100%;padding:13px;background:var(--orange);color:#fff;
+  border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;margin-bottom:20px;
+  transition:background .15s;
+}
+#evaluate-btn:hover{background:var(--orange-dark);}
+
+/* ── Database cards ── */
+.db-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:12px;margin-bottom:20px;}
+@media(max-width:560px){.db-grid{grid-template-columns:1fr;}}
+.db-card{
+  background:#fff;border:1.5px solid var(--border);border-radius:14px;
+  padding:18px;transition:all .2s;cursor:default;
+}
+.db-card:hover{border-color:var(--orange);box-shadow:0 4px 16px rgba(244,121,32,.12);}
+.db-icon{font-size:26px;margin-bottom:8px;}
+.db-name{font-size:15px;font-weight:700;margin-bottom:4px;}
+.db-desc{font-size:12.5px;color:var(--ink-soft);line-height:1.5;}
+
+/* ── Operator Builder ── */
+.op-tabs{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;}
+.op-tab{
+  padding:8px 18px;border-radius:10px;border:2px solid var(--border);
+  background:#fff;font-size:13.5px;font-weight:700;cursor:pointer;
+  transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif;
+}
+.op-tab.active{background:var(--orange);border-color:var(--orange);color:#fff;}
+.op-panel{display:none;animation:fadeIn .2s;}
+.op-panel.active{display:block;}
+.op-definition{
+  background:var(--orange-glow);border-left:4px solid var(--orange);
+  border-radius:0 12px 12px 0;padding:14px 18px;margin-bottom:16px;
+}
+.op-definition .op-symbol{font-size:22px;font-weight:800;color:var(--orange);margin-bottom:4px;}
+.op-definition p{font-size:14px;color:var(--ink);line-height:1.55;}
+.op-example-box{
+  background:#fff;border:1.5px solid var(--border);border-radius:12px;
+  padding:16px 20px;margin-bottom:14px;
+}
+.op-example-box .label{font-size:11px;font-weight:700;letter-spacing:.08em;color:var(--ink-soft);margin-bottom:8px;}
+.query-string{
+  font-family:monospace;font-size:15px;color:var(--ink);
+  background:var(--surface);border-radius:8px;padding:10px 14px;
+  word-break:break-all;line-height:1.6;
+}
+.query-string .op{color:var(--orange);font-weight:700;}
+.query-string .term{color:#1A6B8A;}
+.query-string .exact{color:#7B3FAB;}
+
+/* ── Search Builder ── */
+.builder-area{
+  background:#fff;border:2px solid var(--border);border-radius:14px;
+  padding:18px 20px;margin-bottom:16px;min-height:60px;
+}
+.builder-label{font-size:11.5px;font-weight:700;letter-spacing:.07em;color:var(--ink-soft);margin-bottom:10px;}
+#query-output{
+  font-family:monospace;font-size:16px;min-height:36px;
+  color:var(--ink);word-break:break-word;line-height:1.5;
+}
+.token{
+  display:inline;cursor:pointer;padding:2px 1px;border-radius:4px;
+  transition:background .1s;
+}
+.token:hover{background:rgba(244,121,32,.15);}
+.token-op{color:var(--orange);font-weight:700;}
+.token-term{color:#1A6B8A;}
+.token-exact{color:#7B3FAB;}
+.chip-zone{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;}
+.chip{
+  padding:7px 16px;border-radius:24px;border:2px solid var(--border);
+  background:#fff;font-size:13px;font-weight:600;cursor:pointer;
+  transition:all .15s;font-family:'Plus Jakarta Sans',sans-serif;
+}
+.chip.term-chip{color:#1A6B8A;border-color:#1A6B8A;}
+.chip.op-chip{color:var(--orange);border-color:var(--orange);}
+.chip.exact-chip{color:#7B3FAB;border-color:#7B3FAB;}
+.chip:hover{transform:translateY(-2px);box-shadow:0 4px 10px rgba(0,0,0,.1);}
+#clear-builder{
+  background:none;border:1.5px solid var(--border);border-radius:8px;
+  font-size:13px;font-weight:600;color:var(--ink-soft);padding:6px 16px;cursor:pointer;
+  font-family:'Plus Jakarta Sans',sans-serif;transition:all .15s;
+}
+#clear-builder:hover{border-color:var(--danger);color:var(--danger);}
+
+/* ── Challenge form ── */
+.form-group{margin-bottom:16px;}
+.form-label{font-size:12.5px;font-weight:700;color:var(--ink-soft);letter-spacing:.04em;margin-bottom:6px;display:block;}
+.form-input{
+  width:100%;padding:11px 15px;border:2px solid var(--border);border-radius:10px;
+  font-size:14px;font-family:'Plus Jakarta Sans',sans-serif;color:var(--ink);
+  transition:border-color .15s;background:#fff;
+}
+.form-input:focus{outline:none;border-color:var(--orange);}
+.team-section-title{font-size:13px;font-weight:700;color:var(--orange);margin:20px 0 10px;border-bottom:2px solid var(--orange-glow);padding-bottom:6px;}
+
+/* ── Flow diagram ── */
+.flow-line{display:flex;flex-direction:column;align-items:center;gap:0;margin-bottom:24px;}
+.flow-node{
+  width:100%;max-width:460px;text-align:center;
+  background:#fff;border:2px solid var(--border);border-radius:14px;
+  padding:13px 20px;font-size:14.5px;font-weight:600;
+  transition:all .25s;
+}
+.flow-node.highlight{border-color:var(--orange);background:var(--orange-glow);color:var(--orange-dark);}
+.flow-arrow{font-size:20px;color:var(--orange);padding:4px 0;line-height:1;}
+
+/* ── Before/After ── */
+.ba-pair{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:24px;}
+@media(max-width:540px){.ba-pair{grid-template-columns:1fr;}}
+.ba-card{border-radius:14px;padding:22px;text-align:center;}
+.ba-card.before{background:#f0f0f5;border:2px solid #d5d5e0;}
+.ba-card.after{background:var(--orange-glow);border:2px solid var(--orange);}
+.ba-label{font-size:11.5px;font-weight:700;letter-spacing:.08em;margin-bottom:12px;text-transform:uppercase;}
+.ba-card.before .ba-label{color:var(--ink-soft);}
+.ba-card.after .ba-label{color:var(--orange);}
+.ba-text{font-family:'Lora',serif;font-size:15px;line-height:1.6;font-style:italic;}
+
+/* ── Exit ticket ── */
+.ticket-box{
+  border:2px dashed var(--orange);border-radius:16px;
+  padding:28px;background:var(--orange-glow);margin-bottom:20px;
+}
+.ticket-prompt{font-family:'Lora',serif;font-size:17px;font-style:italic;margin-bottom:14px;line-height:1.5;color:var(--ink);}
+.ticket-input{
+  width:100%;min-height:90px;padding:14px 16px;
+  border:2px solid rgba(244,121,32,.35);border-radius:12px;
+  font-family:'Plus Jakarta Sans',sans-serif;font-size:14px;color:var(--ink);
+  background:rgba(255,255,255,.7);resize:vertical;
+  transition:border-color .15s;
+}
+.ticket-input:focus{outline:none;border-color:var(--orange);}
+.ticket-box+.ticket-box{margin-top:16px;}
+
+/* ── Closing quote ── */
+.closing-quote{
+  text-align:center;padding:36px 24px;
+  border:2px solid var(--orange);border-radius:20px;
+  background:var(--orange-glow);margin-bottom:24px;
+}
+.closing-quote blockquote{
+  font-family:'Lora',serif;font-size:clamp(15px,2.5vw,20px);
+  font-style:italic;line-height:1.6;color:var(--ink);margin-bottom:14px;
+}
+.closing-quote cite{font-size:12.5px;color:var(--ink-soft);font-style:normal;font-weight:600;}
+.competency-row{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-top:20px;}
+.competency-pill{
+  padding:9px 18px;border-radius:24px;border:2px solid var(--orange);
+  color:var(--orange-dark);font-size:13.5px;font-weight:700;background:#fff;
+}
+
+/* ── Animations ── */
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+.fadeIn{animation:fadeIn .3s ease;}
+
+/* ── Utils ── */
+.mb8{margin-bottom:8px;}
+.mb16{margin-bottom:16px;}
+.mb24{margin-bottom:24px;}
+.hint{font-size:12.5px;color:var(--ink-soft);font-style:italic;}
+.tag-strip{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:20px;}
+.tag{display:inline-block;padding:5px 12px;border-radius:20px;font-size:12.5px;font-weight:600;background:var(--surface);color:var(--ink-soft);}
+.tag.orange{background:var(--orange-glow);color:var(--orange-dark);}
+hr.divider{border:none;border-top:1.5px solid var(--border);margin:20px 0;}
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<header id="header">
+  <div id="header-left">
+    <button id="menu-btn" onclick="toggleSidebar()" aria-label="Menú">☰</button>
+    <div id="header-logo">ABI</div>
+    <div id="header-title">
+      Directrices para Estructurar Información
+      <span>Aprendizaje Basado en la Indagación · Licenciatura</span>
+    </div>
+  </div>
+  <div id="station-label">Cargando…</div>
+</header>
+
+<div id="progress-bar"><div id="progress-fill"></div></div>
+
+<!-- Sidebar -->
+<nav id="sidebar">
+  <div class="sidebar-station" onclick="goTo(0)"><span class="sidebar-icon">🔥</span>Detonador</div>
+  <div class="sidebar-station" onclick="goTo(1)"><span class="sidebar-icon">🔺</span>Dato → Info → Conocimiento</div>
+  <div class="sidebar-station" onclick="goTo(2)"><span class="sidebar-icon">🔍</span>Evalúa tus fuentes</div>
+  <div class="sidebar-station" onclick="goTo(3)"><span class="sidebar-icon">🗂️</span>¿Dónde buscar?</div>
+  <div class="sidebar-station" onclick="goTo(4)"><span class="sidebar-icon">⚙️</span>Operadores booleanos</div>
+  <div class="sidebar-station" onclick="goTo(5)"><span class="sidebar-icon">🏆</span>Desafío de investigación</div>
+  <div class="sidebar-station" onclick="goTo(6)"><span class="sidebar-icon">🎯</span>Cierre &amp; Exit ticket</div>
+</nav>
+
+<!-- Main area -->
+<main id="main">
+
+  <!-- ══ ESTACIÓN 0: DETONADOR ══ -->
+  <section class="station active" id="station-0">
+    <div class="content-wrap">
+      <div class="station-eyebrow">Estación 1 · Detonador</div>
+      <h1 class="station-title">Tenemos un problema.</h1>
+      <p class="station-subtitle">Una semana. Un informe. Un tema enorme. ¿Por dónde empezamos?</p>
+
+      <div class="question-box">
+        <div class="q-label">El reto de hoy</div>
+        <p class="q-text">"Evalúa el impacto de la tecnología en la sostenibilidad urbana y presenta evidencia confiable."</p>
+      </div>
+
+      <div class="card-grid">
+        <div class="card">
+          <div style="font-size:28px;margin-bottom:10px;">🤔</div>
+          <h3 class="sub">En tu equipo discutan:</h3>
+          <p class="lede" style="margin-bottom:0;font-size:14px;">¿Qué buscarían primero? ¿En dónde? ¿Cómo sabrían si la información es confiable?</p>
+        </div>
+        <div class="card">
+          <div style="font-size:28px;margin-bottom:10px;">🏙️</div>
+          <h3 class="sub">Conceptos del tema:</h3>
+          <div class="tag-strip">
+            <span class="tag orange">Smart City</span>
+            <span class="tag orange">Sensores</span>
+            <span class="tag">Contaminación</span>
+            <span class="tag">Energía</span>
+            <span class="tag">Transporte</span>
+            <span class="tag orange">IA urbana</span>
+            <span class="tag">Calidad del aire</span>
+          </div>
+          <p class="hint">¿Alguno de estos términos les es familiar?</p>
+        </div>
+      </div>
+
+      <div class="card" style="border-left:4px solid var(--orange);">
+        <p style="font-size:14.5px;line-height:1.7;color:var(--ink);">
+          <strong>Pregunta guía de la clase:</strong> ¿Cómo estructuramos una búsqueda que nos permita encontrar <em>datos, información y conocimiento confiable</em> sobre ciudades inteligentes y sostenibilidad?
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ESTACIÓN 1: DATO → INFO → CONOCIMIENTO ══ -->
+  <section class="station" id="station-1">
+    <div class="content-wrap">
+      <div class="station-eyebrow">Estación 2 · Conceptos base</div>
+      <h1 class="station-title">¿En qué momento un dato nos ayuda a comprender?</h1>
+      <p class="station-subtitle">Haz clic en cada nivel para revelar su significado con un ejemplo real.</p>
+
+      <div class="step-ladder">
+        <div class="step-item active" id="step-0" onclick="activateStep(0)">
+          <div class="step-badge">D</div>
+          <div class="step-content">
+            <div class="step-title">Dato — el elemento crudo</div>
+            <div class="step-body">Un valor sin contexto. Solo existe. No explica nada por sí mismo.</div>
+            <div class="step-example">🌡️ <strong>42</strong> · <strong>Sensor</strong> · <strong>2 °C</strong> · <strong>Ciudad</strong><br>¿Podemos tomar una decisión solo con esto?</div>
+          </div>
+        </div>
+        <div class="step-item locked" id="step-1" onclick="activateStep(1)">
+          <div class="step-badge">I</div>
+          <div class="step-content">
+            <div class="step-title">Información — datos + contexto</div>
+            <div class="step-body">Cuando organizamos los datos y les damos significado. Ya podemos describir algo.</div>
+            <div class="step-example">📍 "El sensor 42, ubicado en el centro de la ciudad, registró un <strong>aumento de 2 °C</strong> el martes a las 18:00 h."<br>Ahora sabemos cuándo, dónde y cuánto.</div>
+          </div>
+        </div>
+        <div class="step-item locked" id="step-2" onclick="activateStep(2)">
+          <div class="step-badge">C</div>
+          <div class="step-content">
+            <div class="step-title">Conocimiento — análisis + interpretación</div>
+            <div class="step-body">Cuando relacionamos información de múltiples fuentes para <em>explicar, comparar y decidir</em>.</div>
+            <div class="step-example">🧠 "Los datos de temperatura y tráfico del último mes sugieren una correlación entre las horas punta vehiculares y el aumento de temperatura urbana. Esto se alinea con el modelo de isla de calor documentado en Smith et al. (2024)."</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card" style="border-color:var(--orange);background:var(--orange-glow);">
+        <p style="font-size:14.5px;line-height:1.7;"><strong>Para reflexionar en equipo:</strong> En su informe, ¿necesitarán datos, información o conocimiento? ¿Qué tipo de fuentes les permitirá llegar al tercer nivel?</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ESTACIÓN 2: EVALÚA FUENTES ══ -->
+  <section class="station" id="station-2">
+    <div class="content-wrap">
+      <div class="station-eyebrow">Estación 3 · Validación de fuentes</div>
+      <h1 class="station-title">Encontrar ≠ Validar</h1>
+      <p class="station-subtitle">Cualquiera puede publicar. No todo lo publicado merece ser citado.</p>
+
+      <h3 class="sub mb8">Los 5 filtros de una fuente confiable</h3>
+      <p class="hint mb16">Marca cada filtro al revisarlo. Luego aplícalos a las dos fuentes de abajo.</p>
+
+      <div class="filter-list">
+        <div class="filter-item" onclick="toggleFilter(this)">
+          <div class="filter-check">✓</div>
+          <div class="filter-text">¿Quién es el autor?<small>Nombre real, credenciales académicas o profesionales verificables</small></div>
+        </div>
+        <div class="filter-item" onclick="toggleFilter(this)">
+          <div class="filter-check">✓</div>
+          <div class="filter-text">¿Qué institución respalda la información?<small>Universidad, organismo público, empresa reconocida</small></div>
+        </div>
+        <div class="filter-item" onclick="toggleFilter(this)">
+          <div class="filter-check">✓</div>
+          <div class="filter-text">¿Existe revisión por pares?<small>Fue evaluada por expertos antes de publicarse</small></div>
+        </div>
+        <div class="filter-item" onclick="toggleFilter(this)">
+          <div class="filter-check">✓</div>
+          <div class="filter-text">¿Presenta referencias y evidencia?<small>Cita otras fuentes, datos verificables, metodología</small></div>
+        </div>
+        <div class="filter-item" onclick="toggleFilter(this)">
+          <div class="filter-check">✓</div>
+          <div class="filter-text">¿Está actualizada?<small>Publicación reciente, relevante para el tema de hoy</small></div>
+        </div>
+      </div>
+
+      <hr class="divider">
+      <h3 class="sub mb8">Aplica los filtros — ¿cuál usarías?</h3>
+      <div class="source-pair">
+        <div class="source-card" id="srcA">
+          <div class="source-tag a">Fuente A</div>
+          <div class="source-title">"The impact of smart city technologies on urban sustainability"</div>
+          <div class="source-meta">
+            Journal of Urban Technology · 2025<br>
+            María López · Universidad Autónoma<br>
+            42 referencias · DOI disponible<br>
+            <strong>Revisión por pares ✓</strong>
+          </div>
+          <div class="source-verdict">✅ Cumple los 5 filtros. Alta confiabilidad académica.</div>
+        </div>
+        <div class="source-card" id="srcB">
+          <div class="source-tag b">Fuente B</div>
+          <div class="source-title">"10 tecnologías que salvarán nuestras ciudades"</div>
+          <div class="source-meta">
+            Autor: Admin123<br>
+            Fecha: indefinida<br>
+            Sin institución · Sin referencias<br>
+            Sin metodología
+          </div>
+          <div class="source-verdict">❌ No cumple ningún filtro. No apta como evidencia académica.</div>
+        </div>
+      </div>
+      <button id="evaluate-btn" onclick="evaluateSources()">⚖️ Evaluar ambas fuentes con los filtros</button>
+      <p class="hint" style="text-align:center;">¿Cuál de las dos usarían en su informe? ¿Por qué la otra no sirve?</p>
+    </div>
+  </section>
+
+  <!-- ══ ESTACIÓN 3: DÓNDE BUSCAR ══ -->
+  <section class="station" id="station-3">
+    <div class="content-wrap">
+      <div class="station-eyebrow">Estación 4 · Motores y bases académicas</div>
+      <h1 class="station-title">¿Dónde buscar información confiable?</h1>
+      <p class="station-subtitle">No todos los buscadores son iguales. Estos están diseñados para investigación académica.</p>
+
+      <div class="db-grid">
+        <div class="db-card">
+          <div class="db-icon">🎓</div>
+          <div class="db-name">Google Académico</div>
+          <div class="db-desc">Indexa artículos, tesis, libros y patentes. Punto de entrada ideal. Muestra citas y versiones gratuitas.</div>
+        </div>
+        <div class="db-card">
+          <div class="db-icon">🌎</div>
+          <div class="db-name">SciELO</div>
+          <div class="db-desc">Biblioteca electrónica de revistas científicas de América Latina y el Caribe. Acceso abierto y gratuito.</div>
+        </div>
+        <div class="db-card">
+          <div class="db-icon">📚</div>
+          <div class="db-name">Redalyc</div>
+          <div class="db-desc">Red de revistas científicas de América Latina. Fuerte en ciencias sociales y humanas. Acceso libre.</div>
+        </div>
+        <div class="db-card">
+          <div class="db-icon">🔬</div>
+          <div class="db-name">ERIC</div>
+          <div class="db-desc">Instituto de Ciencias de la Educación (EE.UU.). Referencia para investigación educativa y pedagogía.</div>
+        </div>
+      </div>
+
+      <div class="card" style="background:var(--orange-glow);border-color:var(--orange);">
+        <h3 class="sub" style="color:var(--orange-dark);">⚠️ Ojo con la cantidad de resultados</h3>
+        <p style="font-size:14.5px;line-height:1.7;">Una búsqueda amplia como <strong>"ciudades inteligentes"</strong> puede devolver miles de resultados con distintos niveles de relevancia. La próxima estación te enseña cómo precisar tu búsqueda con operadores.</p>
+      </div>
+
+      <div class="question-box" style="margin-top:16px;">
+        <div class="q-label">Para reflexionar</div>
+        <p class="q-text" style="font-size:18px;">No basta con <em>encontrar</em> resultados.<br>Debemos encontrar resultados <strong>pertinentes</strong> y evaluar sus fuentes.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ESTACIÓN 4: OPERADORES ══ -->
+  <section class="station" id="station-4">
+    <div class="content-wrap">
+      <div class="station-eyebrow">Estación 5 · Operadores booleanos</div>
+      <h1 class="station-title">El lenguaje de la búsqueda precisa</h1>
+      <p class="station-subtitle">Cuatro herramientas que transforman una búsqueda genérica en una estrategia.</p>
+
+      <div class="op-tabs" id="op-tabs">
+        <button class="op-tab active" onclick="switchOp('and')">AND</button>
+        <button class="op-tab" onclick="switchOp('or')">OR</button>
+        <button class="op-tab" onclick="switchOp('not')">NOT</button>
+        <button class="op-tab" onclick="switchOp('quotes')">" &nbsp;"</button>
+        <button class="op-tab" onclick="switchOp('combo')">Combinación</button>
+      </div>
+
+      <!-- AND -->
+      <div class="op-panel active" id="op-and">
+        <div class="op-definition">
+          <div class="op-symbol">AND = Delimitar</div>
+          <p>Reduce los resultados exigiendo que <strong>ambos términos</strong> estén presentes. Búsquedas más específicas.</p>
+        </div>
+        <div class="op-example-box">
+          <div class="label">EJEMPLO</div>
+          <div class="query-string"><span class="term">"Smart Cities"</span> <span class="op">AND</span> <span class="term">sostenibilidad</span></div>
+        </div>
+        <div class="card"><p style="font-size:14px;line-height:1.6;">Solo aparecen artículos que hablen <em>a la vez</em> de Smart Cities y de sostenibilidad. Los que traten solo uno de los dos quedan excluidos. <strong>¿La cantidad de resultados sube o baja?</strong> ⬇️</p></div>
+      </div>
+
+      <!-- OR -->
+      <div class="op-panel" id="op-or">
+        <div class="op-definition">
+          <div class="op-symbol">OR = Ampliar</div>
+          <p>Incluye resultados donde aparezca <strong>cualquiera de los dos términos</strong>. Ideal para sinónimos.</p>
+        </div>
+        <div class="op-example-box">
+          <div class="label">EJEMPLO</div>
+          <div class="query-string"><span class="term">Tecnología</span> <span class="op">OR</span> <span class="term">innovación</span></div>
+        </div>
+        <div class="card"><p style="font-size:14px;line-height:1.6;">Aparecen artículos que usen "tecnología" o "innovación" (o ambos). Útil cuando el mismo concepto tiene varios nombres. <strong>¿Cuándo ampliaría tu búsqueda?</strong> ⬆️</p></div>
+      </div>
+
+      <!-- NOT -->
+      <div class="op-panel" id="op-not">
+        <div class="op-definition">
+          <div class="op-symbol">NOT = Excluir</div>
+          <p>Elimina de los resultados todo lo que contenga el término excluido. Filtra ruido.</p>
+        </div>
+        <div class="op-example-box">
+          <div class="label">EJEMPLO</div>
+          <div class="query-string"><span class="term">"Inteligencia Artificial"</span> <span class="op">NOT</span> <span class="term">"vehículos autónomos"</span></div>
+        </div>
+        <div class="card"><p style="font-size:14px;line-height:1.6;">Si tu tema es IA aplicada a energía o calidad del aire, puedes excluir los artículos sobre autos autónomos para no contaminar tus resultados. <strong>¿En qué situaciones necesitarías excluir?</strong></p></div>
+      </div>
+
+      <!-- Comillas -->
+      <div class="op-panel" id="op-quotes">
+        <div class="op-definition">
+          <div class="op-symbol">" " = Frase exacta</div>
+          <p>Obliga al buscador a encontrar esa secuencia de palabras <strong>exactamente como está escrita</strong>.</p>
+        </div>
+        <div class="op-example-box">
+          <div class="label">SIN COMILLAS vs. CON COMILLAS</div>
+          <div class="query-string"><span class="term">impacto ambiental</span></div>
+          <div style="margin:8px 0;text-align:center;color:var(--ink-soft);font-size:13px;">vs.</div>
+          <div class="query-string"><span class="exact">"impacto ambiental"</span></div>
+        </div>
+        <div class="card"><p style="font-size:14px;line-height:1.6;">Sin comillas el buscador puede separar las palabras. Con comillas garantizas que aparezca la expresión completa. Esencial para términos técnicos de múltiples palabras.</p></div>
+      </div>
+
+      <!-- Combinación -->
+      <div class="op-panel" id="op-combo">
+        <div class="op-definition">
+          <div class="op-symbol">Combinando todo</div>
+          <p>Las búsquedas más poderosas usan varios operadores juntos. Aquí está la búsqueda completa del reto:</p>
+        </div>
+        <div class="op-example-box">
+          <div class="label">BÚSQUEDA AVANZADA COMPLETA</div>
+          <div class="query-string">(<span class="exact">"Smart City"</span> <span class="op">OR</span> <span class="exact">"Ciudad Inteligente"</span>) <span class="op">AND</span> (<span class="term">sostenibilidad</span> <span class="op">OR</span> <span class="exact">"ecología urbana"</span>) <span class="op">AND</span> (<span class="exact">"calidad del aire"</span> <span class="op">OR</span> <span class="term">contaminación</span>)</div>
+        </div>
+        <div class="card" style="background:var(--orange-glow);border-color:var(--orange);">
+          <p style="font-size:14px;line-height:1.6;"><strong>¿Qué logra esta búsqueda?</strong> Incluye dos formas del concepto principal (Smart City / Ciudad Inteligente), dos formas de sostenibilidad, y dos formas del indicador ambiental. Ningún resultado relevante queda excluido por la terminología.</p>
+        </div>
+      </div>
+
+      <!-- Builder -->
+      <hr class="divider">
+      <h3 class="sub">🛠️ Constructor de búsqueda — practica aquí</h3>
+      <p class="hint mb16">Haz clic en los chips para construir tu propia cadena de búsqueda.</p>
+
+      <div class="builder-area">
+        <div class="builder-label">Tu cadena de búsqueda:</div>
+        <div id="query-output"><span style="color:var(--ink-soft);font-size:14px;">Haz clic en los chips de abajo →</span></div>
+      </div>
+
+      <div class="chip-zone">
+        <span class="chip exact-chip" onclick="addToken('&quot;Smart City&quot;','exact')">"Smart City"</span>
+        <span class="chip exact-chip" onclick="addToken('&quot;Ciudad Inteligente&quot;','exact')">"Ciudad Inteligente"</span>
+        <span class="chip term-chip" onclick="addToken('sostenibilidad','term')">sostenibilidad</span>
+        <span class="chip exact-chip" onclick="addToken('&quot;energía renovable&quot;','exact')">"energía renovable"</span>
+        <span class="chip term-chip" onclick="addToken('contaminación','term')">contaminación</span>
+        <span class="chip exact-chip" onclick="addToken('&quot;calidad del aire&quot;','exact')">"calidad del aire"</span>
+        <span class="chip term-chip" onclick="addToken('innovación','term')">innovación</span>
+      </div>
+      <div class="chip-zone">
+        <span class="chip op-chip" onclick="addToken('AND','op')">AND</span>
+        <span class="chip op-chip" onclick="addToken('OR','op')">OR</span>
+        <span class="chip op-chip" onclick="addToken('NOT','op')">NOT</span>
+        <span class="chip op-chip" onclick="addToken('(','op')">(</span>
+        <span class="chip op-chip" onclick="addToken(')','op')">)</span>
+      </div>
+      <button id="clear-builder" onclick="clearBuilder()">Limpiar ✕</button>
+    </div>
+  </section>
+
+  <!-- ══ ESTACIÓN 5: DESAFÍO ══ -->
+  <section class="station" id="station-5">
+    <div class="content-wrap">
+      <div class="station-eyebrow">Estación 6 · Desafío de investigación</div>
+      <h1 class="station-title">¡Es hora de construir tu protocolo!</h1>
+      <p class="station-subtitle">En equipo, completen la plantilla. Luego prueben sus búsquedas en dos motores académicos y comparen.</p>
+
+      <div class="card" style="margin-bottom:20px;">
+        <div class="team-section-title">📋 Datos del equipo</div>
+        <div class="form-group">
+          <label class="form-label">Nombre del equipo</label>
+          <input class="form-input" type="text" placeholder="Ej: Equipo Alfa">
+        </div>
+
+        <div class="team-section-title">🗝️ Concepto 1</div>
+        <div class="card-grid">
+          <div class="form-group">
+            <label class="form-label">Concepto principal</label>
+            <input class="form-input" type="text" placeholder="Ej: Smart City">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sinónimos o términos alternativos</label>
+            <input class="form-input" type="text" placeholder="Ej: Ciudad inteligente, ciudad digital">
+          </div>
+        </div>
+
+        <div class="team-section-title">🗝️ Concepto 2</div>
+        <div class="card-grid">
+          <div class="form-group">
+            <label class="form-label">Concepto principal</label>
+            <input class="form-input" type="text" placeholder="Ej: sostenibilidad">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sinónimos</label>
+            <input class="form-input" type="text" placeholder="Ej: ecología urbana, desarrollo sostenible">
+          </div>
+        </div>
+
+        <div class="team-section-title">🗝️ Concepto 3</div>
+        <div class="card-grid">
+          <div class="form-group">
+            <label class="form-label">Concepto principal</label>
+            <input class="form-input" type="text" placeholder="Ej: calidad del aire">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Sinónimos</label>
+            <input class="form-input" type="text" placeholder="Ej: contaminación, emisiones">
+          </div>
+        </div>
+
+        <div class="team-section-title">🔎 Estrategias de búsqueda</div>
+        <div class="form-group">
+          <label class="form-label">Búsqueda 1 (más amplia)</label>
+          <input class="form-input" type="text" placeholder='Ej: "Smart City" AND sostenibilidad'>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Búsqueda 2 (más específica con NOT o comillas)</label>
+          <input class="form-input" type="text" placeholder='Ej: "Smart City" AND "calidad del aire" NOT automóviles'>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Búsqueda 3 (combinación avanzada)</label>
+          <input class="form-input" type="text" placeholder='Ej: ("Smart City" OR "Ciudad Inteligente") AND (sostenibilidad OR "ecología urbana")'>
+        </div>
+
+        <div class="team-section-title">📊 Resultados de la prueba</div>
+        <div class="card-grid">
+          <div class="form-group">
+            <label class="form-label">Motor 1 — ¿cuál fue más útil?</label>
+            <input class="form-input" type="text" placeholder="Ej: Google Académico">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Motor 2</label>
+            <input class="form-input" type="text" placeholder="Ej: SciELO">
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Operador que hizo mayor diferencia</label>
+          <input class="form-input" type="text" placeholder="Ej: AND porque redujo resultados irrelevantes">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Criterio de confiabilidad más importante para el equipo</label>
+          <input class="form-input" type="text" placeholder="Ej: revisión por pares">
+        </div>
+      </div>
+
+      <div class="question-box">
+        <div class="q-label">Compartamos los descubrimientos</div>
+        <p class="q-text" style="font-size:17px;">¿Cuál de sus búsquedas funcionó mejor? ¿Qué cambiarían si lo hicieran de nuevo?</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ESTACIÓN 6: CIERRE ══ -->
+  <section class="station" id="station-6">
+    <div class="content-wrap">
+      <div class="station-eyebrow">Estación 7 · Cierre y reflexión</div>
+      <h1 class="station-title">De la pregunta al conocimiento.</h1>
+
+      <!-- Flowchart -->
+      <div class="flow-line mb24">
+        <div class="flow-node highlight" id="fn0" onclick="highlightFlow(0)">1. Definir la pregunta de investigación</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node" id="fn1" onclick="highlightFlow(1)">2. Descomponer conceptos clave</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node" id="fn2" onclick="highlightFlow(2)">3. Construir estrategia de búsqueda</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node" id="fn3" onclick="highlightFlow(3)">4. Evaluar las fuentes encontradas</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node" id="fn4" onclick="highlightFlow(4)">5. Comparar evidencias</div>
+        <div class="flow-arrow">↓</div>
+        <div class="flow-node" id="fn5" onclick="highlightFlow(5)">6. Construir conocimiento propio</div>
+      </div>
+
+      <!-- Before / After -->
+      <h3 class="sub mb16">¿Qué cambió en tu forma de buscar?</h3>
+      <div class="ba-pair mb24">
+        <div class="ba-card before">
+          <div class="ba-label">Antes</div>
+          <p class="ba-text">"Busco en Google, elijo el primer resultado y copio la información."</p>
+        </div>
+        <div class="ba-card after">
+          <div class="ba-label">Después de hoy</div>
+          <p class="ba-text">"Defino mi pregunta, identifico conceptos, construyo una estrategia, evalúo fuentes y selecciono evidencia confiable."</p>
+        </div>
+      </div>
+
+      <!-- Exit Ticket -->
+      <h3 class="sub mb8">🎟️ Exit Ticket</h3>
+      <p class="hint mb16">Completa las siguientes reflexiones antes de terminar la clase.</p>
+
+      <div class="ticket-box">
+        <p class="ticket-prompt">"Lo más importante que aprendí hoy para convertirme en un mejor investigador es…"</p>
+        <textarea class="ticket-input" placeholder="Escribe tu reflexión aquí…"></textarea>
+      </div>
+
+      <div class="ticket-box">
+        <p class="ticket-prompt">"El operador booleano que considero más útil es <strong>______</strong> porque…"</p>
+        <textarea class="ticket-input" placeholder="Escribe tu reflexión aquí…"></textarea>
+      </div>
+
+      <hr class="divider">
+      <div class="closing-quote">
+        <blockquote>"En la era de la información, la competencia no está en encontrar más datos, sino en saber cuáles merecen nuestra confianza."</blockquote>
+        <cite>Directrices para Estructurar y Aprovechar la Información · ABI 2023</cite>
+        <div class="competency-row">
+          <span class="competency-pill">BUSCAR</span>
+          <span class="competency-pill">ANALIZAR</span>
+          <span class="competency-pill">EVALUAR</span>
+          <span class="competency-pill">RELACIONAR</span>
+          <span class="competency-pill">CONSTRUIR</span>
+        </div>
+      </div>
+
+      <p class="hint" style="text-align:center;">Información ≠ Conocimiento. Un buen investigador sabe la diferencia.</p>
+    </div>
+  </section>
+
+</main>
+
+<!-- Bottom nav -->
+<nav id="bottom-nav">
+  <button class="nav-btn" id="btn-prev" onclick="navigate(-1)">← Anterior</button>
+  <span id="nav-counter">1 / 7</span>
+  <button class="nav-btn" id="btn-next" onclick="navigate(1)">Siguiente →</button>
+</nav>
+
+<script>
+// ── State ──
+let current = 0;
+const TOTAL = 7;
+const STATION_NAMES = [
+  '🔥 Detonador',
+  '🔺 Dato → Info → Conocimiento',
+  '🔍 Evalúa tus fuentes',
+  '🗂️ ¿Dónde buscar?',
+  '⚙️ Operadores booleanos',
+  '🏆 Desafío de investigación',
+  '🎯 Cierre & Exit ticket'
+];
+let stepUnlocked = 0;
+let sidebarOpen = false;
+let queryTokens = [];
+
+// ── Navigation ──
+function goTo(n){
+  if(n < 0 || n >= TOTAL) return;
+  const prev = document.getElementById('station-'+current);
+  const next = document.getElementById('station-'+n);
+  if(prev) prev.classList.replace('active','prev');
+  if(next){ next.classList.remove('prev'); next.classList.add('active'); }
+  if(prev) setTimeout(()=>{ prev.classList.remove('prev'); }, 350);
+  current = n;
+  updateUI();
+  if(sidebarOpen) toggleSidebar();
+}
+
+function navigate(dir){
+  goTo(current + dir);
+}
+
+function updateUI(){
+  document.getElementById('progress-fill').style.width = ((current+1)/TOTAL*100)+'%';
+  document.getElementById('station-label').textContent = STATION_NAMES[current];
+  document.getElementById('nav-counter').textContent = (current+1)+' / '+TOTAL;
+  document.getElementById('btn-prev').style.visibility = current === 0 ? 'hidden' : 'visible';
+  document.getElementById('btn-next').textContent = current === TOTAL-1 ? '¡Finalizar! 🎓' : 'Siguiente →';
+  document.querySelectorAll('.sidebar-station').forEach((el,i)=>{
+    el.classList.toggle('active', i === current);
+  });
+}
+
+function toggleSidebar(){
+  sidebarOpen = !sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('open', sidebarOpen);
+}
+
+// ── Step reveal (Estación 2) ──
+function activateStep(i){
+  if(i > stepUnlocked) return;
+  document.querySelectorAll('.step-item').forEach((el,idx)=>{
+    el.classList.remove('active');
+    if(idx <= stepUnlocked) el.classList.remove('locked');
+    else el.classList.add('locked');
+  });
+  document.getElementById('step-'+i).classList.add('active');
+  if(i === stepUnlocked && i < 2){
+    stepUnlocked++;
+    const next = document.getElementById('step-'+stepUnlocked);
+    if(next) next.classList.remove('locked');
+  }
+}
+
+// ── Filters (Estación 3) ──
+function toggleFilter(el){
+  el.classList.toggle('checked');
+  if(el.classList.contains('checked')){
+    el.querySelector('.filter-check').textContent = '✓';
+  } else {
+    el.querySelector('.filter-check').textContent = '✓';
+  }
+}
+
+// ── Evaluate sources ──
+function evaluateSources(){
+  document.getElementById('srcA').classList.add('good');
+  document.getElementById('srcB').classList.add('bad');
+  document.getElementById('evaluate-btn').textContent = '✅ Evaluación completada';
+  document.getElementById('evaluate-btn').style.background = 'var(--success)';
+  document.getElementById('evaluate-btn').disabled = true;
+}
+
+// ── Operator tabs ──
+function switchOp(op){
+  document.querySelectorAll('.op-tab').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.op-panel').forEach(p=>p.classList.remove('active'));
+  event.target.classList.add('active');
+  document.getElementById('op-'+op).classList.add('active');
+}
+
+// ── Query builder ──
+function addToken(text, type){
+  queryTokens.push({text, type});
+  renderQuery();
+}
+
+function renderQuery(){
+  const el = document.getElementById('query-output');
+  if(queryTokens.length === 0){
+    el.innerHTML = '<span style="color:var(--ink-soft);font-size:14px;">Haz clic en los chips de abajo →</span>';
+    return;
+  }
+  el.innerHTML = queryTokens.map((t,i)=>{
+    const cls = t.type === 'op' ? 'token-op' : t.type === 'exact' ? 'token-exact' : 'token-term';
+    return `<span class="token ${cls}" onclick="removeToken(${i})" title="Clic para eliminar">${t.text.replace(/"/g,'&quot;').replace(/"/g,'"').replace(/"/g,'"')} </span>`;
+  }).join('');
+}
+
+function removeToken(i){
+  queryTokens.splice(i,1);
+  renderQuery();
+}
+
+function clearBuilder(){
+  queryTokens = [];
+  renderQuery();
+}
+
+// ── Flow diagram highlight ──
+function highlightFlow(i){
+  document.querySelectorAll('.flow-node').forEach((n,idx)=>{
+    n.classList.toggle('highlight', idx === i);
+  });
+}
+
+// ── Init ──
+updateUI();
+</script>
+</body>
+</html>
