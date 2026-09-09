@@ -143,22 +143,6 @@ footer{
 </div>
 
 
-<div class="editor">
-
-<h2>Modificar nombres de materias</h2>
-
-<p>Puedes cambiar los nombres de los botones desde aquí.</p>
-
-<input id="edit1" placeholder="Nombre botón 1">
-<input id="edit2" placeholder="Nombre botón 2">
-<input id="edit3" placeholder="Nombre botón 3">
-<input id="edit4" placeholder="Nombre botón 4">
-<input id="edit5" placeholder="Nombre botón 5">
-
-<button onclick="actualizar()">Actualizar botones</button>
-
-</div>
-
 </div>
 
 
@@ -166,17 +150,6 @@ footer{
 Página principal de materias docentes
 </footer>
 
-
-<script>
-function actualizar(){
- for(let i=1;i<=5;i++){
-  let valor=document.getElementById("edit"+i).value;
-  if(valor.trim()!=""){
-    document.getElementById("materia"+i).innerHTML=valor;
-  }
- }
-}
-</script>
 
 </body>
 </html>
