@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portal de Materias</title>
+<style>
+:root{
+ --naranja:#f57c00;
+ --naranja2:#ef6c00;
+ --blanco:#ffffff;
+ --fondo:#fff8f0;
+ --texto:#3d2b1f;
+}
+*{box-sizing:border-box}
+body{
+ margin:0;
+ font-family:"Segoe UI",Arial,sans-serif;
+ background:linear-gradient(135deg,#fff8f0,#ffffff);
+ color:var(--texto);
+ min-height:100vh;
+ display:flex;
+ flex-direction:column;
+}
+header{
+ background:linear-gradient(135deg,var(--naranja),var(--naranja2));
+ color:white;
+ padding:50px 20px;
+ text-align:center;
+ border-radius:0 0 40px 40px;
+}
+header h1{
+ margin:0;
+ font-size:3rem;
+}
+header p{
+ font-size:1.2rem;
+}
+.container{
+ max-width:1000px;
+ width:90%;
+ margin:40px auto;
+}
+.menu{
+ display:grid;
+ grid-template-columns:repeat(auto-fit,minmax(250px,1fr));
+ gap:25px;
+}
+.boton{
+ background:white;
+ border:3px solid #ffcc80;
+ border-radius:25px;
+ padding:35px 20px;
+ text-align:center;
+ text-decoration:none;
+ color:var(--texto);
+ font-weight:800;
+ font-size:1.3rem;
+ transition:.3s;
+ box-shadow:0 10px 20px rgba(0,0,0,.1);
+ cursor:pointer;
+}
+.boton:hover{
+ transform:translateY(-8px);
+ background:#fff3e0;
+ border-color:var(--naranja);
+}
+.icono{
+ font-size:3rem;
+ display:block;
+ margin-bottom:15px;
+}
+.editor{
+ margin-top:40px;
+ background:white;
+ padding:25px;
+ border-radius:20px;
+ border-left:8px solid var(--naranja);
+ box-shadow:0 10px 20px rgba(0,0,0,.08);
+}
+input{
+ width:100%;
+ padding:12px;
+ margin:8px 0;
+ border:1px solid #ddd;
+ border-radius:10px;
+}
+button{
+ background:var(--naranja);
+ color:white;
+ border:0;
+ padding:12px 20px;
+ border-radius:10px;
+ cursor:pointer;
+ font-weight:bold;
+}
+footer{
+ margin-top:auto;
+ background:var(--naranja2);
+ color:white;
+ padding:20px;
+ text-align:center;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+<h1>Portal Educativo</h1>
+<p>Selecciona la materia que deseas trabajar</p>
+</header>
+
+<div class="container">
+
+<div class="menu">
+
+<a class="boton" href="#">
+<span class="icono">∑</span>
+<span id="materia1">Lógica Matemática</span>
+</a>
+
+<a class="boton" href="#">
+<span class="icono">💻</span>
+<span id="materia2">Tecnología y Gestión de la Información</span>
+</a>
+
+<a class="boton" href="#">
+<span class="icono">📘</span>
+<span id="materia3">Materia 3</span>
+</a>
+
+<a class="boton" href="#">
+<span class="icono">🔬</span>
+<span id="materia4">Materia 4</span>
+</a>
+
+<a class="boton" href="#">
+<span class="icono">📚</span>
+<span id="materia5">Materia 5</span>
+</a>
+
+</div>
+
+
+<div class="editor">
+
+<h2>Modificar nombres de materias</h2>
+
+<p>Puedes cambiar los nombres de los botones desde aquí.</p>
+
+<input id="edit1" placeholder="Nombre botón 1">
+<input id="edit2" placeholder="Nombre botón 2">
+<input id="edit3" placeholder="Nombre botón 3">
+<input id="edit4" placeholder="Nombre botón 4">
+<input id="edit5" placeholder="Nombre botón 5">
+
+<button onclick="actualizar()">Actualizar botones</button>
+
+</div>
+
+</div>
+
+
+<footer>
+Página principal de materias docentes
+</footer>
+
+
+<script>
+function actualizar(){
+ for(let i=1;i<=5;i++){
+  let valor=document.getElementById("edit"+i).value;
+  if(valor.trim()!=""){
+    document.getElementById("materia"+i).innerHTML=valor;
+  }
+ }
+}
+</script>
+
+</body>
+</html>
