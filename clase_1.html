@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+<title>Herramientas para compartir información · Sesión ABP</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Lora:wght@500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#F2ECDE;
+    --paper-deep:#E8DFC7;
+    --ink:#26313A;
+    --ink-soft:#5C6670;
+    --line:#D9CEB2;
+    --teal:#2F6F5B;
+    --teal-soft:#E1EEE7;
+    --clay:#B15A2E;
+    --clay-soft:#F5E5D9;
+    --card:#FFFDF7;
+    --font-head:'Lora',Georgia,serif;
+    --font-body:'Inter',system-ui,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;font-family:var(--font-body);background:var(--paper);color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+  }
+  .app{max-width:640px;margin:0 auto;min-height:100dvh;display:flex;flex-direction:column}
+
+  header.topbar{padding:16px 18px 12px;background:var(--paper-deep);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+  .title-row{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+  .title-row h1{font-family:var(--font-head);font-weight:600;font-size:17px;margin:0;line-height:1.3}
+  .phase-meta{font-size:12.5px;color:var(--ink-soft);white-space:nowrap;flex-shrink:0}
+
+  .timebar{display:flex;gap:3px;margin-top:12px;height:6px}
+  .timebar .seg{flex-grow:1;border-radius:3px;background:var(--line);position:relative;overflow:hidden}
+  .timebar .seg.done{background:var(--teal);opacity:.45}
+  .timebar .seg.now{background:var(--teal)}
+  .timebar .seg.off{background:transparent;border:1px solid var(--line)}
+
+  main.slide-area{flex:1;padding:22px 20px 30px;overflow-y:auto}
+  main.slide-area h2{font-family:var(--font-head);font-weight:600;font-size:23px;line-height:1.3;margin:0 0 6px}
+  main.slide-area h3{font-family:var(--font-head);font-weight:600;font-size:17px;margin:22px 0 8px}
+  main.slide-area p{line-height:1.6;font-size:15.5px;margin:0 0 12px;color:var(--ink)}
+  main.slide-area .lede{color:var(--ink-soft);font-size:15px;margin-bottom:18px}
+
+  .case{border-left:3px solid var(--teal);background:var(--teal-soft);padding:14px 16px;border-radius:0 10px 10px 0;margin:16px 0;line-height:1.6;font-size:15px}
+  .case strong{font-family:var(--font-head);font-weight:600;display:block;margin-bottom:4px;font-size:14.5px}
+
+  .dilemma{border-left:3px solid var(--clay);background:var(--clay-soft);padding:14px 16px;border-radius:0 10px 10px 0;margin:16px 0;line-height:1.6;font-size:15px}
+  .dilemma strong{font-family:var(--font-head);font-weight:600;display:block;margin-bottom:4px;font-size:14.5px;color:#7C3E1B}
+
+  .field-list{border-top:1px solid var(--line);margin-top:14px}
+  .field-row{border-bottom:1px solid var(--line);padding:12px 0}
+  .field-row .k{font-size:12.5px;color:var(--ink-soft);margin-bottom:3px}
+  .field-row .v{font-size:15px;line-height:1.5}
+
+  .tool-block{margin:20px 0}
+  .tool-block .tname{font-family:var(--font-head);font-weight:600;font-size:16px;color:var(--teal);margin-bottom:4px}
+  .tool-block p{margin-bottom:8px}
+  .tool-block .examples{font-size:14px;color:var(--ink-soft);margin:0 0 6px}
+  .tool-block .q{font-size:14.5px;font-style:italic;color:var(--ink)}
+
+  ol.steps{padding-left:20px;margin:0 0 14px}
+  ol.steps li{margin-bottom:8px;line-height:1.55;font-size:15px}
+  ul.plain{padding-left:20px;margin:0 0 14px}
+  ul.plain li{margin-bottom:6px;line-height:1.55;font-size:15px}
+
+  .rubric{border-top:1px solid var(--line);margin-top:10px}
+  .rubric-row{display:flex;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+  .rubric-row .crit{font-weight:500}
+  .rubric-row .pts{color:var(--ink-soft);white-space:nowrap}
+
+  .closing-line{font-family:var(--font-head);font-size:17px;line-height:1.5;margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+
+  /* quiz */
+  .qz-progress{height:5px;background:var(--line);border-radius:3px;overflow:hidden;margin:4px 0 18px}
+  .qz-progress .bar{height:100%;width:0;background:var(--teal);transition:width .25s}
+  .qz-counter{font-size:12.5px;color:var(--ink-soft);margin-bottom:6px}
+  .qz-question{font-family:var(--font-head);font-weight:600;font-size:17px;line-height:1.4;margin-bottom:16px}
+  .qz-option{display:block;width:100%;text-align:left;border:1.5px solid var(--line);background:var(--card);border-radius:10px;padding:12px 14px;margin-bottom:10px;font-size:14.5px;font-family:var(--font-body);color:var(--ink);cursor:pointer}
+  .qz-option:disabled{cursor:default}
+  .qz-option.correct{background:var(--teal-soft);border-color:var(--teal)}
+  .qz-option.incorrect{background:var(--clay-soft);border-color:var(--clay)}
+  .qz-feedback{display:none;border-radius:10px;padding:13px 14px;margin:6px 0 16px;font-size:14px;line-height:1.55}
+  .qz-feedback.show{display:block}
+  .qz-feedback.ok{background:var(--teal-soft);border-left:3px solid var(--teal)}
+  .qz-feedback.no{background:var(--clay-soft);border-left:3px solid var(--clay)}
+  .qz-next{border:0;border-radius:10px;padding:11px 16px;background:var(--ink);color:var(--paper);font-weight:500;font-size:14.5px;cursor:pointer;display:none}
+  .qz-next.show{display:inline-block}
+  .qz-result{text-align:center;padding:10px 0}
+  .qz-score{font-family:var(--font-head);font-size:38px;font-weight:600;color:var(--teal);margin:6px 0}
+  .qz-retry{border:1.5px solid var(--ink);background:transparent;color:var(--ink);border-radius:10px;padding:10px 16px;font-size:14.5px;font-weight:500;cursor:pointer;margin-top:10px}
+
+  footer.navbar{position:sticky;bottom:0;background:var(--paper-deep);border-top:1px solid var(--line);padding:12px 18px calc(12px + env(safe-area-inset-bottom));display:flex;align-items:center;justify-content:space-between;gap:10px;z-index:5}
+  .nav-btn{border:0;border-radius:10px;padding:13px 18px;font-family:var(--font-body);font-weight:500;font-size:15px;cursor:pointer;min-width:100px}
+  .nav-btn.primary{background:var(--ink);color:var(--paper)}
+  .nav-btn.ghost{background:transparent;border:1.5px solid var(--ink-soft);color:var(--ink)}
+  .nav-btn:disabled{opacity:.35;cursor:default}
+  .dots{display:flex;gap:5px}
+  .dots span{width:6px;height:6px;border-radius:50%;background:var(--line)}
+  .dots span.active{background:var(--teal);width:16px;border-radius:3px}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="title-row">
+      <h1 id="slideTitle">Herramientas para compartir información</h1>
+      <span class="phase-meta" id="phaseMeta"></span>
+    </div>
+    <div class="timebar" id="timebar"></div>
+  </header>
+
+  <main class="slide-area" id="slideArea"></main>
+
+  <footer class="navbar">
+    <button class="nav-btn ghost" id="prevBtn">Anterior</button>
+    <div class="dots" id="dots"></div>
+    <button class="nav-btn primary" id="nextBtn">Siguiente</button>
+  </footer>
+</div>
+
+<script>
+/* ---------- Contenido de la sesión ---------- */
+const MIN_SEGMENTS = [10,15,20,20,20,20,10,5]; // minutos por fase 1-8
+
+const slides = [
+{
+  phaseIndex:0, timeLabel:'Antes de comenzar',
+  html:`
+    <p class="lede">Licenciatura en Psicología · Aprendizaje Basado en Problemas · 120 minutos</p>
+    <h2>Reto: compartir información de forma responsable</h2>
+    <p>Un equipo de estudiantes de Psicología necesita compartir una presentación, un video y una carpeta de archivos con datos de entrevistas. Hoy ustedes van a resolver ese problema.</p>
+    <div class="case">
+      <strong>Producto final de la sesión</strong>
+      Una propuesta de estrategia digital: qué herramienta usar para cada material, quién tendrá acceso, y por qué.
+    </div>
+    <p class="lede">Trabajaremos desde el celular, sin necesidad de computadora. Avancen conmigo con los botones de abajo.</p>
+  `
+},
+{
+  phaseIndex:1, timeLabel:'0–10 min',
+  html:`
+    <h2>Activación · Tenemos un problema</h2>
+    <div class="case">
+      <strong>Caso: Psicología en la comunidad</strong>
+      Un equipo prepara una campaña de psicoeducación para jóvenes. Tiene una presentación sobre ansiedad, un video de 5 minutos sobre higiene del sueño y una carpeta con documentos y entrevistas. No sabe qué herramienta usar para cada cosa, y algunos archivos contienen información sensible.
+    </div>
+    <p><strong>Pregunta problema:</strong> ¿cómo debería organizar y compartir el equipo su información, sin perder de vista el propósito de cada recurso y el manejo responsable de los datos?</p>
+    <h3>Respondan antes de saber la respuesta</h3>
+    <div class="field-list">
+      <div class="field-row"><div class="k">Necesitamos compartir la presentación</div><div class="v">¿Qué herramienta usarían y por qué?</div></div>
+      <div class="field-row"><div class="k">Necesitamos publicar el video</div><div class="v">¿Qué herramienta usarían y por qué?</div></div>
+      <div class="field-row"><div class="k">Necesitamos compartir los archivos del equipo</div><div class="v">¿Qué herramienta usarían y por qué?</div></div>
+    </div>
+    <p class="lede">No importa si se equivocan: la idea es notar qué necesitamos investigar.</p>
+  `
+},
+{
+  phaseIndex:2, timeLabel:'10–25 min',
+  html:`
+    <h2>Identificación · ¿Qué sabemos?</h2>
+    <p>Formen equipos de 3 a 4 personas y respondan en conjunto:</p>
+    <ol class="steps">
+      <li>¿Qué herramientas conocen para compartir información?</li>
+      <li>¿Para qué utilizan normalmente YouTube?</li>
+      <li>¿Han usado algún servicio de almacenamiento en la nube?</li>
+      <li>¿Cómo compartirían una presentación con su grupo?</li>
+      <li>¿Qué información relacionada con Psicología no debería compartirse públicamente?</li>
+    </ol>
+    <p class="lede">La última pregunta es la más importante: aquí empieza la dimensión ética de la sesión.</p>
+  `
+},
+{
+  phaseIndex:3, timeLabel:'25–45 min',
+  html:`
+    <h2>Indagación · Cada equipo investiga una herramienta</h2>
+    <div class="field-list">
+      <div class="field-row"><div class="k">Equipo 1</div><div class="v">SlideShare</div></div>
+      <div class="field-row"><div class="k">Equipo 2</div><div class="v">YouTube</div></div>
+      <div class="field-row"><div class="k">Equipo 3</div><div class="v">Dropbox</div></div>
+    </div>
+    <h3>Ficha de investigación (desde su celular)</h3>
+    <ul class="plain">
+      <li>¿Qué es y para qué sirve?</li>
+      <li>¿Qué tipo de información permite compartir?</li>
+      <li>¿Quién podría usarla en Psicología, y con qué ejemplo?</li>
+      <li>¿Qué ventajas y qué limitaciones tiene?</li>
+      <li>¿Qué información NO sería recomendable compartir ahí públicamente?</li>
+    </ul>
+  `
+},
+{
+  phaseIndex:4, timeLabel:'45–65 min',
+  html:`
+    <h2>Análisis · Lo que descubrimos</h2>
+    <div class="tool-block">
+      <div class="tname">SlideShare</div>
+      <p>Orientada a la difusión de presentaciones y materiales visuales.</p>
+      <div class="examples">Ejemplos: teorías psicológicas, infografías de salud mental, resultados académicos.</div>
+      <div class="q">¿Sería apropiado subir una presentación con nombres y datos de pacientes? — No.</div>
+    </div>
+    <div class="tool-block">
+      <div class="tname">YouTube</div>
+      <p>Plataforma para publicar y distribuir contenido audiovisual.</p>
+      <div class="examples">Ejemplos: cápsulas de psicoeducación, entrevistas académicas autorizadas.</div>
+      <div class="q">¿Todo lo que podamos publicar significa que debamos publicarlo? Acceso público no es lo mismo que información apropiada para hacerse pública.</div>
+    </div>
+    <div class="tool-block">
+      <div class="tname">Dropbox</div>
+      <p>Almacenamiento, organización y compartición de archivos.</p>
+      <div class="examples">Ejemplos: documentos, fotografías, material de investigación, trabajo colaborativo.</div>
+      <div class="q">¿Compartir un enlace significa que cualquier persona debería tener acceso? Aquí trabajamos permisos → acceso → privacidad → responsabilidad.</div>
+    </div>
+  `
+},
+{
+  phaseIndex:5, timeLabel:'65–85 min',
+  html:`
+    <h2>Aplicación · Consultores digitales</h2>
+    <p>Ahora son el equipo tecnológico que asesora al grupo de Psicología. Completen, por equipo:</p>
+    <div class="field-list">
+      <div class="field-row"><div class="k">Presentación</div><div class="v">Herramienta · acceso · por qué</div></div>
+      <div class="field-row"><div class="k">Video</div><div class="v">Herramienta · acceso · por qué</div></div>
+      <div class="field-row"><div class="k">Documentos del proyecto</div><div class="v">Herramienta · acceso · por qué</div></div>
+      <div class="field-row"><div class="k">Entrevistas</div><div class="v">Herramienta · acceso · por qué</div></div>
+    </div>
+    <div class="dilemma">
+      <strong>Reto adicional</strong>
+      El coordinador del proyecto dice: "para hacerlo más fácil, suban absolutamente todo a internet y compartan un solo enlace." ¿Aceptarían la propuesta? Respondan sí, no o depende — y justifiquen.
+    </div>
+  `
+},
+{
+  phaseIndex:6, timeLabel:'85–105 min',
+  html:`
+    <h2>Producción · Estrategia digital para Psicología</h2>
+    <p>Cada equipo crea, desde su celular, una infografía o esquema corto con este título:</p>
+    <div class="case">
+      <strong>"Estrategia digital para Psicología en la comunidad"</strong>
+      Pueden usar Canva, Google Docs, una presentación desde el teléfono, WhatsApp, o incluso papel si alguien tiene problemas de conectividad.
+    </div>
+    <h3>Debe incluir</h3>
+    <ul class="plain">
+      <li>SlideShare — lo utilizaríamos para…</li>
+      <li>YouTube — lo utilizaríamos para…</li>
+      <li>Dropbox — lo utilizaríamos para…</li>
+      <li>Una regla: "la información psicológica debe compartirse considerando…" (privacidad, consentimiento, confidencialidad, permisos, audiencia, propósito)</li>
+    </ul>
+  `
+},
+{
+  phaseIndex:7, timeLabel:'105–115 min',
+  html:`
+    <h2>Socialización</h2>
+    <p>Cada equipo cuenta con 1 a 2 minutos. No es una exposición larga: solo respondan</p>
+    <div class="case">
+      <strong>¿Qué herramienta utilizarían y por qué?</strong>
+      Después, se les preguntará: "¿y qué pasaría si la información incluyera datos personales?" — su respuesta se convierte en la defensa de su solución.
+    </div>
+  `
+},
+{
+  phaseIndex:8, timeLabel:'115–120 min',
+  isQuiz:true,
+  html:`
+    <h2>Evaluación · Reto interactivo</h2>
+    <p class="lede">10 situaciones, retroalimentación inmediata. Respondan desde su celular.</p>
+    <div id="quizMount"></div>
+  `
+},
+{
+  phaseIndex:9, timeLabel:'Cierre',
+  html:`
+    <h2>Cierre</h2>
+    <p><strong>Pregunta final:</strong> si mañana fueran psicólogos y tuvieran que compartir información profesional en internet, ¿qué sería más importante: elegir la mejor herramienta, o saber qué información pueden compartir?</p>
+    <h3>Criterios que evaluamos hoy</h3>
+    <div class="rubric">
+      <div class="rubric-row"><span class="crit">Identificación de herramientas</span><span class="pts">/4</span></div>
+      <div class="rubric-row"><span class="crit">Aplicación al problema</span><span class="pts">/4</span></div>
+      <div class="rubric-row"><span class="crit">Argumentación</span><span class="pts">/4</span></div>
+      <div class="rubric-row"><span class="crit">Uso responsable de la información</span><span class="pts">/4</span></div>
+      <div class="rubric-row"><span class="crit">Trabajo colaborativo</span><span class="pts">/4</span></div>
+    </div>
+    <p class="closing-line">La tecnología determina cómo compartimos la información; nuestra responsabilidad profesional determina qué información debemos compartir, con quién y bajo qué condiciones.</p>
+  `
+}
+];
+
+/* ---------- Navegación entre slides ---------- */
+let current = 0;
+const slideArea = document.getElementById('slideArea');
+const phaseMeta = document.getElementById('phaseMeta');
+const timebarEl = document.getElementById('timebar');
+const dotsEl = document.getElementById('dots');
+const prevBtn = document.getElementById('prevBtn');
+const nextBtn = document.getElementById('nextBtn');
+
+function buildTimebar(){
+  timebarEl.innerHTML = '';
+  MIN_SEGMENTS.forEach((m,i)=>{
+    const seg = document.createElement('div');
+    seg.className = 'seg';
+    seg.style.flexGrow = m;
+    seg.dataset.idx = i+1;
+    timebarEl.appendChild(seg);
+  });
+}
+
+function buildDots(){
+  dotsEl.innerHTML = '';
+  slides.forEach((_,i)=>{
+    const d = document.createElement('span');
+    if(i===current) d.classList.add('active');
+    dotsEl.appendChild(d);
+  });
+}
+
+function render(){
+  const s = slides[current];
+  slideArea.innerHTML = s.html;
+  phaseMeta.textContent = s.timeLabel;
+
+  document.querySelectorAll('.timebar .seg').forEach(seg=>{
+    const idx = parseInt(seg.dataset.idx,10);
+    seg.classList.remove('done','now');
+    if(s.phaseIndex===0 || s.phaseIndex===9){ /* portada / cierre: sin resaltado */ }
+    else if(idx < s.phaseIndex) seg.classList.add('done');
+    else if(idx === s.phaseIndex) seg.classList.add('now');
+  });
+
+  buildDots();
+  prevBtn.disabled = current===0;
+  nextBtn.textContent = current===slides.length-1 ? 'Reiniciar' : 'Siguiente';
+  slideArea.scrollTop = 0;
+  window.scrollTo(0,0);
+
+  if(s.isQuiz) initQuiz();
+}
+
+prevBtn.addEventListener('click',()=>{
+  if(current>0){ current--; render(); }
+});
+nextBtn.addEventListener('click',()=>{
+  if(current<slides.length-1){ current++; render(); }
+  else { current=0; render(); }
+});
+
+/* swipe simple para móvil */
+let touchX=null;
+slideArea.addEventListener('touchstart',e=>{touchX=e.touches[0].clientX;});
+slideArea.addEventListener('touchend',e=>{
+  if(touchX===null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if(dx<-60 && current<slides.length-1){ current++; render(); }
+  if(dx>60 && current>0){ current--; render(); }
+  touchX=null;
+});
+
+buildTimebar();
+render();
+
+/* ---------- Quiz embebido ---------- */
+const quizQuestions = [
+{
+ q:"El equipo quiere compartir una presentación de 15 diapositivas sobre prevención de riesgos psicosociales para que otros estudiantes puedan consultarla. ¿Qué herramienta es la opción más directa?",
+ options:["SlideShare","YouTube","Dropbox"],
+ answer:0,
+ fb:"SlideShare está orientado a compartir presentaciones y documentos visuales. YouTube sería apropiado si el producto principal fuera un video, y Dropbox se centra en almacenamiento y distribución de archivos."
+},
+{
+ q:"El equipo grabó un video de 5 minutos con recomendaciones generales de higiene del sueño y quiere difundirlo públicamente. ¿Cuál herramienta se ajusta mejor?",
+ options:["Dropbox","YouTube","SlideShare"],
+ answer:1,
+ fb:"YouTube es una plataforma adecuada para publicar y distribuir contenido audiovisual, siempre que el video no incluya datos personales innecesarios."
+},
+{
+ q:"Los integrantes necesitan una carpeta común para guardar documentos, imágenes y versiones de su proyecto y acceder desde sus teléfonos. ¿Cuál elegirías?",
+ options:["YouTube","SlideShare","Dropbox"],
+ answer:2,
+ fb:"Dropbox resulta adecuado para almacenar, organizar, sincronizar y compartir archivos entre integrantes del equipo."
+},
+{
+ q:"Una estudiante propone subir a YouTube una entrevista completa con un participante de investigación porque 'así todos pueden verla'. ¿Cuál es la principal preocupación?",
+ options:["El video podría durar demasiado.","La privacidad y el consentimiento informado.","YouTube no permite videos de entrevistas."],
+ answer:1,
+ fb:"La privacidad y el consentimiento informado son prioritarios: no debe publicarse información identificable sin base ética y autorización adecuada."
+},
+{
+ q:"El equipo necesita que sus compañeros trabajen sobre la misma versión de una presentación aún en proceso. ¿Qué opción es más apropiada?",
+ options:["Dropbox","YouTube","SlideShare"],
+ answer:0,
+ fb:"Dropbox puede usarse para almacenar y compartir archivos de trabajo en construcción. SlideShare está pensado para presentaciones ya terminadas."
+},
+{
+ q:"¿Cuál situación representa mejor el uso de YouTube en un proyecto de Psicología?",
+ options:["Guardar una carpeta privada con consentimientos informados.","Publicar un video de psicoeducación dirigido al público.","Mantener versiones distintas de un archivo de investigación."],
+ answer:1,
+ fb:"YouTube apoya la divulgación de contenidos audiovisuales, como cápsulas de psicoeducación. Los archivos sensibles necesitan controles de acceso aparte."
+},
+{
+ q:"¿Cuál de estas prácticas es más responsable al usar almacenamiento en la nube para un proyecto académico?",
+ options:["Compartir el enlace con cualquier persona para facilitar el acceso.","Guardar datos sensibles sin revisar permisos.","Configurar los permisos según quién necesita consultar los archivos."],
+ answer:2,
+ fb:"Los permisos deben corresponder a la necesidad real de acceso. Compartir indiscriminadamente puede exponer información que debería mantenerse restringida."
+},
+{
+ q:"Después de resolver el caso, ¿qué criterio debería pesar más al elegir una herramienta para información de Psicología?",
+ options:["Que sea la más popular.","Que tenga el logotipo más atractivo.","Que sea adecuada al propósito y permita un manejo responsable de la información."],
+ answer:2,
+ fb:"La elección debe relacionar propósito, audiencia, tipo de contenido, acceso, privacidad y uso responsable. La popularidad no es un criterio suficiente."
+}
+];
+let qzCurrent=0, qzScore=0, qzAnswered=false;
+
+function initQuiz(){
+  qzCurrent=0; qzScore=0;
+  const mount = document.getElementById('quizMount');
+  if(!mount) return;
+  mount.innerHTML = `
+    <div class="qz-counter" id="qzCounter"></div>
+    <div class="qz-progress"><div class="bar" id="qzBar"></div></div>
+    <div id="qzBody"></div>
+  `;
+  loadQuizQuestion();
+}
+
+function loadQuizQuestion(){
+  qzAnswered=false;
+  const item = quizQuestions[qzCurrent];
+  document.getElementById('qzCounter').textContent = `Pregunta ${qzCurrent+1} de ${quizQuestions.length}`;
+  document.getElementById('qzBar').style.width = (qzCurrent/quizQuestions.length*100)+'%';
+  const body = document.getElementById('qzBody');
+  let optsHtml = item.options.map((opt,i)=>`<button class="qz-option" onclick="answerQuiz(${i},this)">${opt}</button>`).join('');
+  body.innerHTML = `
+    <div class="qz-question">${item.q}</div>
+    <div id="qzOptions">${optsHtml}</div>
+    <div class="qz-feedback" id="qzFeedback"></div>
+    <button class="qz-next" id="qzNextBtn" onclick="nextQuizQuestion()">${qzCurrent===quizQuestions.length-1?'Ver resultado':'Siguiente'}</button>
+  `;
+}
+
+function answerQuiz(i,button){
+  if(qzAnswered) return;
+  qzAnswered=true;
+  const item = quizQuestions[qzCurrent];
+  const opts = document.querySelectorAll('#qzOptions .qz-option');
+  opts.forEach((b,idx)=>{
+    b.disabled=true;
+    if(idx===item.answer) b.classList.add('correct');
+  });
+  const fb = document.getElementById('qzFeedback');
+  if(i===item.answer){
+    qzScore++;
+    fb.className='qz-feedback show ok';
+    fb.innerHTML = '<strong>Correcto.</strong> '+item.fb;
+  } else {
+    button.classList.add('incorrect');
+    fb.className='qz-feedback show no';
+    fb.innerHTML = '<strong>Revisen su decisión.</strong> '+item.fb;
+  }
+  document.getElementById('qzBar').style.width = ((qzCurrent+1)/quizQuestions.length*100)+'%';
+  document.getElementById('qzNextBtn').classList.add('show');
+}
+
+function nextQuizQuestion(){
+  if(qzCurrent < quizQuestions.length-1){ qzCurrent++; loadQuizQuestion(); }
+  else showQuizResult();
+}
+
+function showQuizResult(){
+  const pct = Math.round(qzScore/quizQuestions.length*100);
+  let msg='';
+  if(pct>=90) msg='Excelente. Identifican con claridad el propósito de cada herramienta y el uso responsable de la información.';
+  else if(pct>=70) msg='Buen trabajo. Base sólida; revisen especialmente los criterios de privacidad.';
+  else msg='Conviene reforzar las diferencias entre almacenamiento, difusión audiovisual y distribución de presentaciones.';
+  document.getElementById('qzBody').innerHTML = `
+    <div class="qz-result">
+      <div class="qz-score">${qzScore}/${quizQuestions.length} · ${pct}%</div>
+      <p>${msg}</p>
+      <button class="qz-retry" onclick="initQuiz()">Intentar de nuevo</button>
+    </div>
+  `;
+}
+</script>
+</body>
+</html>
