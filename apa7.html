@@ -1,0 +1,900 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Laboratorio APA 7 — aprende indagando</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,500;8..60,600;8..60,700&family=Work+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --white:#ffffff;
+    --cream:#fff8f2;
+    --orange-50:#ffeee0;
+    --orange-100:#ffdcc0;
+    --orange-300:#ffa561;
+    --orange-500:#ef6a1a;
+    --orange-600:#d95710;
+    --orange-700:#b6440a;
+    --ink:#2a1c12;
+    --ink-soft:#6b5344;
+    --line:#f0d7bd;
+    --good:#3f7d4f;
+    --good-bg:#eaf5ec;
+    --bad:#b6392c;
+    --bad-bg:#fbebe8;
+    --radius:14px;
+    --serif:'Source Serif 4', Georgia, 'Times New Roman', serif;
+    --sans:'Work Sans', 'Calibri', Arial, sans-serif;
+    box-sizing:border-box;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  :root:not([data-theme="light"]){
+    @media (prefers-color-scheme: dark){
+      --white:#1c140d;
+      --cream:#241a11;
+      --orange-50:#3a2313;
+      --orange-100:#4a2c15;
+      --ink:#f6ead e;
+      --ink-soft:#d8bfa9;
+      --line:#4a3220;
+    }
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px);}
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    font-family:var(--sans);
+    background:var(--white);
+    color:var(--ink);
+    -webkit-font-smoothing:antialiased;
+    min-height:100%;
+  }
+  a{color:var(--orange-700);}
+  ::selection{background:var(--orange-100);}
+
+  /* ---------- Top bar ---------- */
+  header.topbar{
+    position:sticky;top:0;z-index:40;
+    padding-top:calc(14px + env(safe-area-inset-top,0px));
+    background:linear-gradient(180deg,var(--orange-600),var(--orange-500));
+    color:#fff;
+    padding-left:20px;padding-right:20px;padding-bottom:14px;
+    display:flex;align-items:center;gap:16px;flex-wrap:wrap;
+    box-shadow:0 2px 10px rgba(182,68,10,.18);
+  }
+  .brand{display:flex;align-items:baseline;gap:10px;flex:1;min-width:200px;}
+  .brand .mark{
+    font-family:var(--serif);font-weight:700;font-size:20px;
+    background:#fff;color:var(--orange-700);
+    width:34px;height:34px;border-radius:9px;
+    display:flex;align-items:center;justify-content:center;flex-shrink:0;
+  }
+  .brand h1{font-family:var(--serif);font-weight:600;font-size:18px;letter-spacing:.2px;}
+  .brand p{font-size:12.5px;color:var(--orange-50);}
+  .progress-wrap{display:flex;align-items:center;gap:10px;font-size:12.5px;color:#fff;}
+  .progress-track{width:130px;height:7px;background:rgba(255,255,255,.32);border-radius:99px;overflow:hidden;}
+  .progress-fill{height:100%;background:#fff;border-radius:99px;transition:width .5s ease;}
+
+  /* ---------- Layout ---------- */
+  .shell{display:flex;min-height:calc(100vh - 74px);}
+  nav.rail{
+    width:236px;flex-shrink:0;background:var(--cream);
+    border-right:1px solid var(--line);
+    padding:22px 14px;
+    position:sticky;top:74px;align-self:flex-start;
+    height:calc(100vh - 74px);overflow-y:auto;
+  }
+  .rail-item{
+    display:flex;align-items:flex-start;gap:11px;
+    padding:11px 10px;border-radius:10px;cursor:pointer;
+    margin-bottom:3px;transition:background .15s ease;
+    border:none;background:transparent;width:100%;text-align:left;
+    font-family:var(--sans);color:var(--ink);
+  }
+  .rail-item:hover{background:var(--orange-50);}
+  .rail-item.active{background:var(--orange-500);color:#fff;}
+  .rail-num{
+    width:24px;height:24px;border-radius:50%;flex-shrink:0;
+    display:flex;align-items:center;justify-content:center;
+    font-size:12px;font-weight:600;
+    background:var(--orange-100);color:var(--orange-700);
+    margin-top:1px;
+  }
+  .rail-item.active .rail-num{background:#fff;color:var(--orange-600);}
+  .rail-item.done .rail-num{background:var(--good);color:#fff;}
+  .rail-item.active.done .rail-num{background:#fff;color:var(--good);}
+  .rail-text b{display:block;font-size:13.5px;font-weight:600;line-height:1.3;}
+  .rail-text span{display:block;font-size:11.5px;opacity:.8;margin-top:1px;}
+
+  main.content{flex:1;min-width:0;padding:38px 26px 90px;}
+  .page{max-width:700px;margin:0 auto;display:none;}
+  .page.active{display:block;animation:fade .35s ease;}
+  @keyframes fade{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:translateY(0);}}
+
+  .eyebrow{font-size:12.5px;color:var(--orange-700);font-weight:600;margin-bottom:6px;}
+  h2.title{font-family:var(--serif);font-size:30px;font-weight:600;line-height:1.15;margin-bottom:10px;}
+  p.lead{font-size:15.5px;color:var(--ink-soft);line-height:1.6;max-width:60ch;margin-bottom:28px;}
+
+  /* ---------- Inquiry card ---------- */
+  .inquiry{
+    background:var(--cream);
+    border:1px solid var(--line);
+    border-radius:var(--radius);
+    padding:22px 22px 20px;
+    margin-bottom:26px;
+  }
+  .inquiry .q-label{font-size:12px;font-weight:600;color:var(--orange-700);margin-bottom:8px;}
+  .inquiry h3{font-family:var(--serif);font-size:19px;font-weight:600;line-height:1.35;margin-bottom:16px;}
+  .guess-options{display:flex;flex-direction:column;gap:8px;margin-bottom:6px;}
+  .guess-opt{
+    text-align:left;border:1px solid var(--line);background:#fff;
+    border-radius:10px;padding:11px 14px;font-family:var(--sans);font-size:14px;color:var(--ink);
+    cursor:pointer;transition:border-color .15s ease, background .15s ease;
+  }
+  .guess-opt:hover{border-color:var(--orange-300);}
+  .guess-opt.picked-right{background:var(--good-bg);border-color:var(--good);}
+  .guess-opt.picked-wrong{background:var(--bad-bg);border-color:var(--bad);}
+  .guess-feedback{
+    margin-top:12px;font-size:13.5px;line-height:1.55;padding:12px 14px;border-radius:10px;
+    display:none;
+  }
+  .guess-feedback.show{display:block;}
+  .guess-feedback.good{background:var(--good-bg);color:#215230;}
+  .guess-feedback.bad{background:var(--bad-bg);color:#7c2a20;}
+
+  /* ---------- Section blocks ---------- */
+  .block{margin-bottom:30px;}
+  .block h4{font-family:var(--serif);font-size:18px;font-weight:600;margin-bottom:10px;}
+  .block p{font-size:14.5px;line-height:1.7;color:var(--ink);margin-bottom:10px;}
+  .block ul{margin:0 0 10px 20px;font-size:14.5px;line-height:1.7;}
+  .block ul li{margin-bottom:4px;}
+
+  .example{
+    border-left:3px solid var(--orange-500);
+    background:var(--cream);
+    padding:13px 16px;
+    border-radius:0 10px 10px 0;
+    font-size:14px;line-height:1.65;
+    margin:10px 0;
+  }
+  .example .tag{display:block;font-size:11px;font-weight:700;letter-spacing:.3px;color:var(--orange-700);margin-bottom:5px;text-transform:uppercase;}
+  .example.wrong{border-left-color:var(--bad);}
+  .example.wrong .tag{color:var(--bad);}
+  .example.right{border-left-color:var(--good);}
+  .example.right .tag{color:var(--good);}
+  .ref-example{font-family:var(--serif);font-size:14px;line-height:1.7;}
+  .ref-example .hang{padding-left:1.27cm;text-indent:-1.27cm;}
+
+  table.fmt{width:100%;border-collapse:collapse;font-size:13.5px;margin:12px 0 16px;}
+  table.fmt th,table.fmt td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top;}
+  table.fmt th{background:var(--orange-50);font-weight:600;color:var(--orange-700);}
+
+  /* ---------- Diagram: document structure ---------- */
+  .doc-diagram{display:flex;flex-direction:column;gap:8px;margin:8px 0 26px;}
+  .doc-part{
+    border:1px solid var(--line);border-radius:10px;background:#fff;
+    padding:12px 14px;cursor:pointer;transition:border-color .15s ease;
+  }
+  .doc-part:hover{border-color:var(--orange-300);}
+  .doc-part.open{border-color:var(--orange-500);background:var(--orange-50);}
+  .doc-part-head{display:flex;justify-content:space-between;align-items:center;}
+  .doc-part-head b{font-family:var(--serif);font-size:15px;font-weight:600;}
+  .doc-part-head span.chev{color:var(--orange-600);font-size:13px;transition:transform .15s ease;}
+  .doc-part.open .chev{transform:rotate(90deg);}
+  .doc-part-body{display:none;font-size:13.5px;line-height:1.65;padding-top:9px;color:var(--ink-soft);}
+  .doc-part.open .doc-part-body{display:block;}
+
+  /* ---------- Tabs (reference explorer) ---------- */
+  .tabbar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px;}
+  .tabbtn{
+    border:1px solid var(--line);background:#fff;color:var(--ink);
+    padding:8px 14px;border-radius:99px;font-size:13px;font-family:var(--sans);font-weight:500;
+    cursor:pointer;transition:all .15s ease;
+  }
+  .tabbtn.active{background:var(--orange-500);border-color:var(--orange-500);color:#fff;}
+  .tabpanel{display:none;}
+  .tabpanel.active{display:block;animation:fade .25s ease;}
+
+  /* ---------- Citation builder ---------- */
+  .builder{
+    background:var(--cream);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px;margin:8px 0 28px;
+  }
+  .builder-row{display:flex;flex-wrap:wrap;gap:18px;margin-bottom:16px;}
+  .builder-field{flex:1;min-width:160px;}
+  .builder-field label{display:block;font-size:11.5px;font-weight:600;color:var(--orange-700);margin-bottom:6px;}
+  .seg{display:flex;border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#fff;}
+  .seg button{
+    flex:1;border:none;background:#fff;padding:8px 6px;font-size:12.5px;cursor:pointer;font-family:var(--sans);color:var(--ink);
+  }
+  .seg button.active{background:var(--orange-500);color:#fff;}
+  .builder-output{
+    background:#fff;border:1px dashed var(--orange-300);border-radius:10px;
+    padding:14px 16px;font-family:var(--serif);font-size:14.5px;line-height:1.65;
+  }
+  .builder-note{font-size:12.5px;color:var(--ink-soft);margin-top:10px;line-height:1.6;}
+
+  /* ---------- Quiz ---------- */
+  .quiz-card{border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px;background:#fff;}
+  .quiz-card .qtext{font-family:var(--serif);font-size:15.5px;font-weight:600;margin-bottom:12px;line-height:1.45;}
+  .quiz-opts{display:flex;flex-direction:column;gap:8px;}
+  .quiz-opt{
+    text-align:left;border:1px solid var(--line);background:var(--white);
+    border-radius:9px;padding:10px 13px;font-size:13.8px;cursor:pointer;font-family:var(--sans);color:var(--ink);
+  }
+  .quiz-opt:hover{border-color:var(--orange-300);}
+  .quiz-opt.correct{background:var(--good-bg);border-color:var(--good);}
+  .quiz-opt.incorrect{background:var(--bad-bg);border-color:var(--bad);}
+  .quiz-fb{margin-top:11px;font-size:13.3px;line-height:1.6;padding:11px 13px;border-radius:9px;display:none;}
+  .quiz-fb.show{display:block;}
+  .quiz-fb.good{background:var(--good-bg);color:#215230;}
+  .quiz-fb.bad{background:var(--bad-bg);color:#7c2a20;}
+  .quiz-fb b{display:block;font-size:12.5px;text-transform:uppercase;letter-spacing:.3px;margin-bottom:3px;}
+
+  .scorebar{
+    display:flex;align-items:center;justify-content:space-between;
+    background:var(--orange-500);color:#fff;border-radius:var(--radius);
+    padding:16px 20px;margin-top:18px;
+  }
+  .scorebar .n{font-family:var(--serif);font-size:26px;font-weight:700;}
+  .scorebar button{
+    background:#fff;color:var(--orange-700);border:none;border-radius:9px;
+    padding:9px 16px;font-size:13px;font-weight:600;cursor:pointer;font-family:var(--sans);
+  }
+
+  .navfoot{display:flex;justify-content:space-between;margin-top:32px;border-top:1px solid var(--line);padding-top:20px;gap:10px;}
+  .navbtn{
+    border:1px solid var(--line);background:#fff;color:var(--ink);border-radius:10px;
+    padding:11px 18px;font-size:13.5px;font-weight:600;cursor:pointer;font-family:var(--sans);
+    display:flex;align-items:center;gap:6px;
+  }
+  .navbtn.primary{background:var(--orange-500);border-color:var(--orange-500);color:#fff;}
+  .navbtn:hover{border-color:var(--orange-500);}
+
+  footer.src{
+    max-width:700px;margin:40px auto 0;font-size:11.5px;color:var(--ink-soft);
+    border-top:1px solid var(--line);padding-top:16px;line-height:1.6;
+  }
+
+  /* mobile */
+  @media (max-width:820px){
+    .shell{flex-direction:column;}
+    nav.rail{
+      width:100%;height:auto;position:sticky;top:calc(64px + env(safe-area-inset-top,0px));
+      display:flex;overflow-x:auto;gap:6px;padding:12px 14px;border-right:none;border-bottom:1px solid var(--line);
+    }
+    .rail-item{flex-shrink:0;width:auto;flex-direction:row;white-space:nowrap;}
+    .rail-text span{display:none;}
+    main.content{padding:26px 16px 70px;}
+    h2.title{font-size:25px;}
+    .builder-row{flex-direction:column;gap:12px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="mark">A7</div>
+    <div>
+      <h1>Laboratorio APA 7</h1>
+      <p>Indaga, prueba y comprueba las Normas APA — 7ª edición</p>
+    </div>
+  </div>
+  <div class="progress-wrap">
+    <span id="progressLabel">0 / 6 módulos</span>
+    <div class="progress-track"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+  </div>
+</header>
+
+<div class="shell">
+  <nav class="rail" id="rail"></nav>
+  <main class="content">
+
+    <!-- MODULE 0: INTRO -->
+    <section class="page" data-page="0">
+      <p class="eyebrow">Módulo 1 de 6</p>
+      <h2 class="title">¿Qué son y para qué sirven las Normas APA?</h2>
+      <p class="lead">Antes de leer la respuesta, arriesga una hipótesis. Así es como funciona la indagación: primero predices, luego contrastas con la fuente.</p>
+
+      <div class="inquiry" data-inquiry="intro1">
+        <div class="q-label">Pregunta de indagación</div>
+        <h3>¿Cuál crees que es el propósito principal de las Normas APA?</h3>
+        <div class="guess-options">
+          <button class="guess-opt" data-correct="false">Hacer que los trabajos se vean más largos y formales</button>
+          <button class="guess-opt" data-correct="true">Dar un formato común para presentar trabajos y dar crédito a las ideas de otros autores, evitando el plagio</button>
+          <button class="guess-opt" data-correct="false">Reemplazar por completo cualquier otro estilo de citación</button>
+        </div>
+        <div class="guess-feedback"></div>
+      </div>
+
+      <div class="block">
+        <h4>Lo que dice la guía</h4>
+        <p>Las Normas APA (American Psychological Association) son un conjunto de estándares creados para unificar la manera de presentar trabajos escritos, sobre todo en ciencias sociales. Esta guía se basa en la <b>7ª edición</b>, publicada en 2020, y resume las actualizaciones frente a la 6ª edición.</p>
+        <p>Un punto que se repite en toda la guía: <i>“Todas las fuentes que se citan en el texto deben aparecer en la lista de referencias al final del documento.”</i> Citar mal —o no citar— puede derivar en plagio, con consecuencias académicas.</p>
+      </div>
+
+      <div class="block">
+        <h4>Lo nuevo de la 7ª edición frente a la 6ª</h4>
+        <table class="fmt">
+          <tr><th>Aspecto</th><th>6ª edición</th><th>7ª edición</th></tr>
+          <tr><td>Tipo de fuente</td><td>Solo Times New Roman 12 pt</td><td>Variedad aceptada: Calibri 11, Arial 11, Georgia 11, Times New Roman 12, etc.</td></tr>
+          <tr><td>Portada de estudiante</td><td>Sin excepciones</td><td>Sin titulillo; título en negrita</td></tr>
+          <tr><td>Uso de "et al."</td><td>Depende del número de autores y de la cita</td><td>Se usa desde la primera cita con 3 o más autores</td></tr>
+          <tr><td>Autores en referencias</td><td>Hasta 7 autores</td><td>Hasta 20 autores</td></tr>
+        </table>
+      </div>
+
+      <div class="navfoot">
+        <span></span>
+        <button class="navbtn primary" onclick="goPage(1)">Siguiente: Formato del documento →</button>
+      </div>
+      <footer class="src">Fuente: Guía Normas APA, 7ª edición (basada en normas-apa.org y el Publication Manual of the APA, 7th ed., 2020).</footer>
+    </section>
+
+    <!-- MODULE 1: FORMATO -->
+    <section class="page" data-page="1">
+      <p class="eyebrow">Módulo 2 de 6</p>
+      <h2 class="title">Formato del documento</h2>
+      <p class="lead">Papel, márgenes, fuente, interlineado y sangría: las reglas que se aplican a casi cada página de un trabajo APA.</p>
+
+      <div class="inquiry" data-inquiry="fmt1">
+        <div class="q-label">Pregunta de indagación</div>
+        <h3>Si tu margen izquierdo mide 1 pulgada, ¿cuánto deberían medir los otros tres márgenes?</h3>
+        <div class="guess-options">
+          <button class="guess-opt" data-correct="false">2 pulgadas arriba, 1 pulgada en el resto</button>
+          <button class="guess-opt" data-correct="true">1 pulgada también, igual en los cuatro lados</button>
+          <button class="guess-opt" data-correct="false">Depende del tamaño de la fuente que uses</button>
+        </div>
+        <div class="guess-feedback"></div>
+      </div>
+
+      <div class="block">
+        <h4>Papel y márgenes</h4>
+        <p>Tamaño carta: 21.59 cm × 27.94 cm (8½ × 11 pulgadas). Margen de <b>2.54 cm (1 pulgada) en los cuatro lados</b>: superior, inferior, izquierdo y derecho.</p>
+      </div>
+
+      <div class="block">
+        <h4>Tipo y tamaño de fuente</h4>
+        <p>La 7ª edición acepta una variedad de fuentes, siempre que uses la misma en todo el documento (incluidos títulos y encabezado):</p>
+        <ul>
+          <li><b>Sin serifas:</b> Calibri 11 pt · Arial 11 pt · Lucida Sans Unicode 10 pt</li>
+          <li><b>Con serifas:</b> Times New Roman 12 pt · Georgia 11 pt · Computer Modern 10 pt</li>
+        </ul>
+        <p>Excepciones: en figuras, usa sans serif de 8–14 pt; en código fuente, una fuente monoespaciada como Courier New 10 pt; en notas al pie, puedes usar un tamaño ligeramente menor.</p>
+      </div>
+
+      <div class="block">
+        <h4>Interlineado, alineación y sangría</h4>
+        <ul>
+          <li><b>Interlineado doble</b> en todo el documento: resumen, citas en bloque, títulos, referencias. Sin espacios extra entre párrafos.</li>
+          <li><b>Alineación a la izquierda</b>, margen derecho irregular. No se justifica el texto.</li>
+          <li><b>Sangría de ½ pulgada (1.27 cm)</b> en la primera línea de cada párrafo — con la tecla Tab o el estilo de párrafo, nunca con la barra espaciadora.</li>
+        </ul>
+        <div class="example wrong">
+          <span class="tag">Incorrecto</span>
+          Usar la barra espaciadora varias veces para sangrar un párrafo, o justificar el texto para que ambos márgenes queden parejos.
+        </div>
+        <div class="example right">
+          <span class="tag">Correcto</span>
+          Configurar el estilo "Normal" en Word con sangría de primera línea de 1.27 cm y alineación izquierda.
+        </div>
+      </div>
+
+      <div class="block">
+        <h4>Comprobación rápida</h4>
+        <div id="quiz-fmt"></div>
+      </div>
+
+      <div class="navfoot">
+        <button class="navbtn" onclick="goPage(0)">← Introducción</button>
+        <button class="navbtn primary" onclick="goPage(2)">Siguiente: Estructura →</button>
+      </div>
+    </section>
+
+    <!-- MODULE 2: ESTRUCTURA -->
+    <section class="page" data-page="2">
+      <p class="eyebrow">Módulo 3 de 6</p>
+      <h2 class="title">Estructura del trabajo</h2>
+      <p class="lead">Explora cada parte del documento tocándola. Después de leer cada una, intenta predecir qué sigue antes de abrir la siguiente.</p>
+
+      <div class="doc-diagram" id="docDiagram">
+        <div class="doc-part" data-part="portada">
+          <div class="doc-part-head"><b>1. Portada</b><span class="chev">›</span></div>
+          <div class="doc-part-body">La portada de <b>estudiante</b> no lleva titulillo (running head); el título va en negrita con una línea extra de doble espacio antes del nombre del autor. La portada <b>profesional</b> sí incluye el titulillo. En ambas, la numeración de página empieza en 1, en la esquina superior derecha.</div>
+        </div>
+        <div class="doc-part" data-part="resumen">
+          <div class="doc-part-head"><b>2. Resumen (Abstract)</b><span class="chev">›</span></div>
+          <div class="doc-part-body">Va en una nueva página, con la etiqueta "Resumen" centrada y en negrita. Se escribe en un solo párrafo sin sangría, normalmente entre <b>150 y 250 palabras</b>. Debe ser preciso, no evaluativo, coherente y conciso. Opcionalmente puedes añadir "Palabras clave:" en cursiva, con el párrafo sangrado.</div>
+        </div>
+        <div class="doc-part" data-part="texto">
+          <div class="doc-part-head"><b>3. Texto o cuerpo</b><span class="chev">›</span></div>
+          <div class="doc-part-body">Se organiza típicamente en Introducción, Método, Resultados y Discusión. La introducción debe ser clara sobre las preguntas y objetivos; el método explica cómo se recopilaron los datos; los resultados informan lo más relevante sin omitir datos clave; la discusión interpreta esos resultados.</div>
+        </div>
+        <div class="doc-part" data-part="titulos">
+          <div class="doc-part-head"><b>4. Títulos y subtítulos</b><span class="chev">›</span></div>
+          <div class="doc-part-body">APA usa hasta 5 niveles, todos en negrita y con capitalización de título (cada palabra en mayúscula inicial). El <b>Nivel 1</b> va centrado y el texto empieza en un nuevo párrafo; el <b>Nivel 2</b> va alineado a la izquierda; del <b>Nivel 3</b> al <b>5</b> se añaden cursiva y/o sangría, y en los niveles 4 y 5 el texto continúa en la misma línea, terminando el título con un punto.</div>
+        </div>
+        <div class="doc-part" data-part="referencias">
+          <div class="doc-part-head"><b>5. Referencias</b><span class="chev">›</span></div>
+          <div class="doc-part-body">Empieza en una página nueva, con el título "Referencias" centrado y en negrita. Cada entrada lleva sangría francesa de 1.27 cm y va ordenada alfabéticamente por el apellido del primer autor.</div>
+        </div>
+        <div class="doc-part" data-part="apendice">
+          <div class="doc-part-head"><b>6. Apéndice (opcional)</b><span class="chev">›</span></div>
+          <div class="doc-part-body">Se usa para material que complementa el texto (cuestionarios, tablas extensas, transcripciones) sin interrumpir su lectura. Las etiquetas y títulos de los apéndices van centrados.</div>
+        </div>
+      </div>
+
+      <div class="inquiry" data-inquiry="struct1">
+        <div class="q-label">Pregunta de indagación</div>
+        <h3>Después de explorar el diagrama: ¿qué título de nivel usarías para el encabezado principal "Método", que abre una sección completa del trabajo?</h3>
+        <div class="guess-options">
+          <button class="guess-opt" data-correct="true">Nivel 1: centrado, negrita, con el texto comenzando en un párrafo nuevo</button>
+          <button class="guess-opt" data-correct="false">Nivel 4: con sangría y el texto en la misma línea</button>
+          <button class="guess-opt" data-correct="false">No necesita ningún formato especial</button>
+        </div>
+        <div class="guess-feedback"></div>
+      </div>
+
+      <div class="block">
+        <h4>Comprobación rápida</h4>
+        <div id="quiz-struct"></div>
+      </div>
+
+      <div class="navfoot">
+        <button class="navbtn" onclick="goPage(1)">← Formato</button>
+        <button class="navbtn primary" onclick="goPage(3)">Siguiente: Citas →</button>
+      </div>
+    </section>
+
+    <!-- MODULE 3: CITAS -->
+    <section class="page" data-page="3">
+      <p class="eyebrow">Módulo 4 de 6</p>
+      <h2 class="title">Citas en el texto</h2>
+      <p class="lead">APA usa el sistema Autor-Fecha. Antes de leer las reglas, intenta clasificar un ejemplo real de la guía.</p>
+
+      <div class="inquiry" data-inquiry="cite1">
+        <div class="q-label">Pregunta de indagación</div>
+        <h3>Lee esta cita: <i>“La aceleración de las partículas... es la prueba cabal de la existencia divina” (Berrío, 2019, p. 87).</i> ¿Es una cita narrativa o parentética?</h3>
+        <div class="guess-options">
+          <button class="guess-opt" data-correct="false">Narrativa: el autor aparece como parte de la oración</button>
+          <button class="guess-opt" data-correct="true">Parentética: el autor y el año aparecen entre paréntesis, no en la oración</button>
+        </div>
+        <div class="guess-feedback"></div>
+      </div>
+
+      <div class="block">
+        <h4>Narrativa vs. parentética</h4>
+        <div class="example right">
+          <span class="tag">Cita narrativa (énfasis en el autor)</span>
+          Berrío (2019) afirma que "esto es la prueba cabal de la existencia divina..." (p. 87).
+        </div>
+        <div class="example right">
+          <span class="tag">Cita parentética (énfasis en la cita)</span>
+          "La aceleración de las partículas... es la prueba cabal de la existencia divina..." (Berrío, 2019, p. 87).
+        </div>
+        <p>En ambos casos debes informar autor, año y página. Solo en casos narrativos poco frecuentes el autor y la fecha van completamente fuera de paréntesis.</p>
+      </div>
+
+      <div class="block">
+        <h4>Parafraseo vs. cita textual</h4>
+        <p>Se recomienda <b>parafrasear</b> —expresar la idea de otro autor con tus propias palabras— antes que citar textualmente. Aun así, siempre debes acreditar apellido y año; la página es recomendable, no obligatoria.</p>
+        <div class="example">
+          <span class="tag">Parafraseo</span>
+          El índice de muertes violentas durante el siglo XXI ha aumentado de manera exponencial (Ramírez, 1983).
+        </div>
+        <p>Una <b>cita textual</b> reproduce las palabras exactas del autor y siempre necesita el número de página:</p>
+        <ul>
+          <li><b>Menos de 40 palabras:</b> va inmersa en el texto, entre comillas dobles, sin cursiva. El punto final va después del paréntesis.</li>
+          <li><b>Más de 40 palabras:</b> va en bloque aparte, sin comillas, con sangría de 1.27 cm y a doble espacio. El punto va antes de los datos entre paréntesis.</li>
+        </ul>
+        <div class="example wrong">
+          <span class="tag">Incorrecto</span>
+          Escribir una cita de 60 palabras entre comillas, dentro del párrafo normal, como si fuera una cita corta.
+        </div>
+        <div class="example right">
+          <span class="tag">Correcto</span>
+          Esa misma cita de 60 palabras se presenta en bloque, sangrada media pulgada, sin comillas, con el punto antes del paréntesis final.
+        </div>
+      </div>
+
+      <div class="block">
+        <h4>Casos especiales</h4>
+        <ul>
+          <li><b>Tres o más autores:</b> se usa "et al." desde la primera cita (cambio de la 7ª edición), siempre que no haya ambigüedad. Ej.: (Sánchez et al., 2020).</li>
+          <li><b>Autores corporativos:</b> la primera vez se escribe el nombre completo con la sigla entre corchetes: (Asociación Americana para el Avance de la Ciencia [AAAC], 2014); luego solo la sigla: (AAAC, 2014).</li>
+          <li><b>Cita secundaria</b> (citas de citas): "(Ayala, 1983, como se citó en Sánchez, 2009)". Solo Sánchez aparece en la lista de referencias, porque es la fuente que sí leíste.</li>
+          <li><b>Comunicaciones personales</b> (correos, WhatsApp, entrevistas): se citan solo en el texto, nunca en la lista de referencias, porque no se pueden recuperar.</li>
+        </ul>
+      </div>
+
+      <div class="block">
+        <h4>Construye tu propia cita</h4>
+        <p style="font-size:13.5px;color:var(--ink-soft);margin-bottom:12px;">Elige las opciones y observa cómo cambia el formato correcto — esta es la parte de indagación activa: prueba combinaciones distintas.</p>
+        <div class="builder">
+          <div class="builder-row">
+            <div class="builder-field">
+              <label>Número de autores</label>
+              <div class="seg" id="seg-authors">
+                <button class="active" data-val="1">1 autor</button>
+                <button data-val="2">2 autores</button>
+                <button data-val="3">3 o más</button>
+              </div>
+            </div>
+            <div class="builder-field">
+              <label>Estilo de cita</label>
+              <div class="seg" id="seg-style">
+                <button class="active" data-val="narrativa">Narrativa</button>
+                <button data-val="parentetica">Parentética</button>
+              </div>
+            </div>
+            <div class="builder-field">
+              <label>Tipo</label>
+              <div class="seg" id="seg-type">
+                <button class="active" data-val="parafraseo">Parafraseo</button>
+                <button data-val="textual">Cita textual</button>
+              </div>
+            </div>
+          </div>
+          <div class="builder-output" id="builderOutput"></div>
+          <p class="builder-note" id="builderNote"></p>
+        </div>
+      </div>
+
+      <div class="block">
+        <h4>Comprobación rápida</h4>
+        <div id="quiz-cite"></div>
+      </div>
+
+      <div class="navfoot">
+        <button class="navbtn" onclick="goPage(2)">← Estructura</button>
+        <button class="navbtn primary" onclick="goPage(4)">Siguiente: Referencias →</button>
+      </div>
+    </section>
+
+    <!-- MODULE 4: REFERENCIAS -->
+    <section class="page" data-page="4">
+      <p class="eyebrow">Módulo 5 de 6</p>
+      <h2 class="title">Lista de referencias</h2>
+      <p class="lead">Cada fuente citada en el texto debe tener su entrada aquí, y viceversa. Explora cómo cambia el formato según el tipo de fuente.</p>
+
+      <div class="inquiry" data-inquiry="ref1">
+        <div class="q-label">Pregunta de indagación</div>
+        <h3>¿Cuáles crees que son los cuatro elementos que toda referencia APA debe incluir?</h3>
+        <div class="guess-options">
+          <button class="guess-opt" data-correct="false">Título, editorial, ciudad y país</button>
+          <button class="guess-opt" data-correct="true">Autor, fecha, título del trabajo y fuente de recuperación</button>
+          <button class="guess-opt" data-correct="false">Autor, número de páginas, idioma y formato del archivo</button>
+        </div>
+        <div class="guess-feedback"></div>
+      </div>
+
+      <div class="block">
+        <h4>Reglas generales</h4>
+        <ul>
+          <li>Empieza en una página nueva titulada "Referencias" (centrado, negrita).</li>
+          <li>Sangría francesa de 1.27 cm en cada entrada.</li>
+          <li>Orden alfabético por el apellido del primer autor.</li>
+          <li>Hasta <b>20 autores</b> se listan todos (invertidos: Apellido, Inicial); con más de 20, se listan los primeros 19, puntos suspensivos y el último autor.</li>
+          <li>No incluyas comunicaciones personales, menciones generales de sitios web completos, ni frases de entrevistados de tu propia investigación.</li>
+        </ul>
+      </div>
+
+      <div class="block">
+        <h4>Explora por tipo de fuente</h4>
+        <div class="tabbar" id="refTabs">
+          <button class="tabbtn active" data-tab="libro">Libro</button>
+          <button class="tabbtn" data-tab="revista">Revista</button>
+          <button class="tabbtn" data-tab="web">Página web</button>
+          <button class="tabbtn" data-tab="tesis">Tesis</button>
+          <button class="tabbtn" data-tab="pdf">PDF</button>
+        </div>
+
+        <div class="tabpanel active" data-panel="libro">
+          <p><b>Estructura:</b> Apellido, Inicial. (Año). <i>Título del libro en cursiva</i>. Editorial.</p>
+          <div class="ref-example"><div class="hang">Herrera Cáceres, C. y Rosillo Peña, M. (2019). <i>Confort y eficiencia energética en el diseño de edificaciones</i>. Universidad del Valle.</div></div>
+        </div>
+        <div class="tabpanel" data-panel="revista">
+          <p><b>Estructura:</b> Apellido, Inicial. (Año). Título del artículo. <i>Nombre de la Revista en cursiva, volumen</i>(número), páginas. DOI o URL.</p>
+          <div class="ref-example"><div class="hang">Castañeda Naranjo, L. A. y Palacios Neri, J. (2015). Nanotecnología: fuente de nuevos paradigmas. <i>Mundo Nano. Revista Interdisciplinaria en Nanociencias y Nanotecnología, 7</i>(12), 45–49. https://doi.org/10.22201/ceiich.24485691e.2014.12.49710</div></div>
+        </div>
+        <div class="tabpanel" data-panel="web">
+          <p><b>Estructura:</b> Apellido, Inicial. o nombre de la organización. (Año, día de mes). <i>Título de la página</i>. Nombre del sitio. URL.</p>
+          <div class="ref-example"><div class="hang">Autor o entidad. (Año). <i>Título de la página web</i>. Nombre del sitio. https://www.url-completa.com</div></div>
+        </div>
+        <div class="tabpanel" data-panel="tesis">
+          <p><b>Estructura:</b> Apellido, Inicial. (Año). <i>Título de la tesis</i> [Tesis de pregrado/maestría/doctorado, Nombre de la institución]. Repositorio, si aplica.</p>
+          <div class="ref-example"><div class="hang">Apellido, N. (Año). <i>Título de la tesis o disertación</i> [Tesis de maestría, Universidad X]. Nombre del repositorio.</div></div>
+        </div>
+        <div class="tabpanel" data-panel="pdf">
+          <p><b>Estructura:</b> igual que el tipo de documento original (libro, informe, artículo); solo agrega la URL directa del PDF si aplica. El formato PDF no cambia la estructura base, solo la fuente de recuperación.</p>
+          <div class="ref-example"><div class="hang">Autor, N. (Año). <i>Título del documento</i> [Archivo PDF]. Editorial o institución. https://www.url-del-pdf.com</div></div>
+        </div>
+      </div>
+
+      <div class="block">
+        <h4>Comprobación rápida</h4>
+        <div id="quiz-ref"></div>
+      </div>
+
+      <div class="navfoot">
+        <button class="navbtn" onclick="goPage(3)">← Citas</button>
+        <button class="navbtn primary" onclick="goPage(5)">Siguiente: Reto final →</button>
+      </div>
+    </section>
+
+    <!-- MODULE 5: RETO FINAL -->
+    <section class="page" data-page="5">
+      <p class="eyebrow">Módulo 6 de 6</p>
+      <h2 class="title">Reto final</h2>
+      <p class="lead">Diez preguntas que mezclan todo lo recorrido: formato, estructura, citas y referencias. Recibe retroalimentación inmediata en cada una.</p>
+
+      <div id="quiz-final"></div>
+      <div class="scorebar" id="scoreBar" style="display:none;">
+        <div>
+          <div style="font-size:12px;opacity:.85;">Tu puntaje</div>
+          <div class="n" id="scoreN">0 / 10</div>
+        </div>
+        <button onclick="resetFinal()">Reintentar</button>
+      </div>
+
+      <div class="navfoot">
+        <button class="navbtn" onclick="goPage(4)">← Referencias</button>
+        <span></span>
+      </div>
+      <footer class="src">Contenido basado en la Guía Normas APA 7ª edición (normas-apa.org) y el Publication Manual of the APA, 7th ed. (American Psychological Association, 2020). Guía resumida no oficial; consulta siempre las políticas específicas de tu institución.</footer>
+    </section>
+
+  </main>
+</div>
+
+<script>
+/* ---------------- navigation ---------------- */
+const modules = [
+  {title:"Introducción", sub:"Qué son y para qué sirven"},
+  {title:"Formato", sub:"Papel, fuente, márgenes"},
+  {title:"Estructura", sub:"Partes del documento"},
+  {title:"Citas", sub:"Narrativa, textual, parafraseo"},
+  {title:"Referencias", sub:"Elementos y tipos de fuente"},
+  {title:"Reto final", sub:"Evaluación mixta"}
+];
+let visited = new Set([0]);
+let current = 0;
+
+function buildRail(){
+  const rail = document.getElementById('rail');
+  rail.innerHTML = modules.map((m,i)=>`
+    <button class="rail-item${i===current?' active':''}${visited.has(i)?' done':''}" data-idx="${i}">
+      <span class="rail-num">${visited.has(i)?'✓':(i+1)}</span>
+      <span class="rail-text"><b>${m.title}</b><span>${m.sub}</span></span>
+    </button>`).join('');
+  rail.querySelectorAll('.rail-item').forEach(btn=>{
+    btn.addEventListener('click',()=>goPage(parseInt(btn.dataset.idx)));
+  });
+}
+
+function goPage(idx){
+  current = idx;
+  visited.add(idx);
+  document.querySelectorAll('.page').forEach(p=>p.classList.toggle('active', parseInt(p.dataset.page)===idx));
+  buildRail();
+  updateProgress();
+  window.scrollTo({top:0,behavior:'smooth'});
+  saveProgress();
+}
+
+function updateProgress(){
+  const pct = Math.round((visited.size/modules.length)*100);
+  document.getElementById('progressFill').style.width = pct+'%';
+  document.getElementById('progressLabel').textContent = `${visited.size} / ${modules.length} módulos`;
+}
+
+function saveProgress(){
+  try{
+    localStorage.setItem('apa7_visited', JSON.stringify([...visited]));
+  }catch(e){}
+}
+function loadProgress(){
+  try{
+    const raw = localStorage.getItem('apa7_visited');
+    if(raw){ visited = new Set(JSON.parse(raw)); }
+  }catch(e){}
+}
+
+/* ---------------- inquiry guess cards ---------------- */
+document.querySelectorAll('.inquiry').forEach(card=>{
+  const opts = card.querySelectorAll('.guess-opt');
+  const fb = card.querySelector('.guess-feedback');
+  opts.forEach(opt=>{
+    opt.addEventListener('click',()=>{
+      if(opt.disabled) return;
+      const correct = opt.dataset.correct === 'true';
+      opts.forEach(o=>o.disabled=true);
+      opt.classList.add(correct?'picked-right':'picked-wrong');
+      if(!correct){
+        const rightOpt = [...opts].find(o=>o.dataset.correct==='true');
+        rightOpt.classList.add('picked-right');
+      }
+      fb.classList.add('show', correct?'good':'bad');
+      fb.textContent = correct
+        ? '✓ Así es. Sigue leyendo para ver por qué y algunos ejemplos.'
+        : '✗ No exactamente — la opción resaltada en verde es la correcta. Revisa la explicación de abajo.';
+    });
+  });
+});
+
+/* ---------------- document structure diagram ---------------- */
+document.querySelectorAll('.doc-part').forEach(part=>{
+  part.querySelector('.doc-part-head').addEventListener('click',()=>{
+    part.classList.toggle('open');
+  });
+});
+
+/* ---------------- reference tabs ---------------- */
+document.getElementById('refTabs').addEventListener('click',e=>{
+  const btn = e.target.closest('.tabbtn');
+  if(!btn) return;
+  document.querySelectorAll('#refTabs .tabbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  const tab = btn.dataset.tab;
+  document.querySelectorAll('.tabpanel').forEach(p=>p.classList.toggle('active', p.dataset.panel===tab));
+});
+
+/* ---------------- citation builder ---------------- */
+const builderState = {authors:'1', style:'narrativa', type:'parafraseo'};
+function wireSeg(id, key){
+  const seg = document.getElementById(id);
+  seg.querySelectorAll('button').forEach(b=>{
+    b.addEventListener('click',()=>{
+      seg.querySelectorAll('button').forEach(x=>x.classList.remove('active'));
+      b.classList.add('active');
+      builderState[key]=b.dataset.val;
+      renderBuilder();
+    });
+  });
+}
+wireSeg('seg-authors','authors');
+wireSeg('seg-style','style');
+wireSeg('seg-type','type');
+
+function authorPhrase(n, style){
+  const names = {1:'Sánchez', 2:'Ayala y Masiero', 3:'Sánchez et al.'};
+  return names[n];
+}
+function renderBuilder(){
+  const {authors, style, type} = builderState;
+  const name = authorPhrase(authors, style);
+  let out = '', note = '';
+
+  if(type==='parafraseo'){
+    if(style==='narrativa'){
+      out = `${name} (2020) sostiene que el fenómeno estudiado presenta un comportamiento distinto al esperado.`;
+    } else {
+      out = `El fenómeno estudiado presenta un comportamiento distinto al esperado (${name}, 2020).`;
+    }
+    note = 'En el parafraseo, la página es recomendable pero no obligatoria.';
+  } else {
+    if(style==='narrativa'){
+      out = `${name} (2020) afirma que "el fenómeno presenta un comportamiento distinto al esperado" (p. 34).`;
+    } else {
+      out = `"El fenómeno presenta un comportamiento distinto al esperado" (${name}, 2020, p. 34).`;
+    }
+    note = 'En la cita textual, la página SIEMPRE es obligatoria. Si el pasaje tuviera más de 40 palabras, iría en bloque, sangrado y sin comillas.';
+  }
+
+  if(authors==='3'){
+    note += ' Con tres o más autores, "et al." se usa desde la primera cita (regla de la 7ª edición).';
+  } else if(authors==='2'){
+    note += ' Con dos autores, ambos apellidos se unen con "y" (o "&" en textos en inglés) en cada cita.';
+  }
+
+  document.getElementById('builderOutput').textContent = out;
+  document.getElementById('builderNote').textContent = note;
+}
+renderBuilder();
+
+/* ---------------- quiz engine ---------------- */
+function renderQuiz(containerId, questions, opts={}){
+  const container = document.getElementById(containerId);
+  let score = 0, answered = 0;
+  container.innerHTML = questions.map((q,qi)=>`
+    <div class="quiz-card" data-qi="${qi}">
+      <div class="qtext">${qi+1}. ${q.q}</div>
+      <div class="quiz-opts">
+        ${q.opts.map((o,oi)=>`<button class="quiz-opt" data-oi="${oi}">${o}</button>`).join('')}
+      </div>
+      <div class="quiz-fb"></div>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.quiz-card').forEach(card=>{
+    const qi = parseInt(card.dataset.qi);
+    const q = questions[qi];
+    const optBtns = card.querySelectorAll('.quiz-opt');
+    const fb = card.querySelector('.quiz-fb');
+    optBtns.forEach((btn,oi)=>{
+      btn.addEventListener('click',()=>{
+        if(card.dataset.answered) return;
+        card.dataset.answered = '1';
+        const correct = oi===q.correct;
+        optBtns.forEach(b=>b.disabled=true);
+        btn.classList.add(correct?'correct':'incorrect');
+        if(!correct) optBtns[q.correct].classList.add('correct');
+        fb.classList.add('show', correct?'good':'bad');
+        fb.innerHTML = `<b>${correct?'Correcto':'No exactamente'}</b>${q.explain}`;
+        answered++;
+        if(correct) score++;
+        if(opts.onAllAnswered && answered===questions.length){
+          opts.onAllAnswered(score);
+        }
+      });
+    });
+  });
+}
+
+const quizFmt = [
+  {q:'¿Cuánto debe medir el margen en cada lado de la página?', opts:['1.5 pulgadas','1 pulgada (2.54 cm) en los cuatro lados','2 cm solo en la parte superior'], correct:1, explain:' El margen APA 7 es de 2.54 cm (1 pulgada), igual en los cuatro lados.'},
+  {q:'¿Cuál de estas fuentes SÍ está aceptada por la 7ª edición?', opts:['Comic Sans 12 pt','Calibri 11 pt','Papyrus 14 pt'], correct:1, explain:' Calibri 11 pt es una de las fuentes sin serifa aceptadas, junto con Arial 11 y Lucida Sans Unicode 10.'},
+  {q:'¿Qué alineación de párrafo se usa en el cuerpo del texto?', opts:['Justificada','Centrada','Izquierda, con margen derecho irregular'], correct:2, explain:' Se usa alineación a la izquierda; no se justifica el texto salvo que la universidad lo pida.'}
+];
+const quizStruct = [
+  {q:'¿Qué diferencia principal hay entre la portada de estudiante y la profesional?', opts:['La de estudiante no lleva titulillo (running head)','La de estudiante no lleva número de página','La profesional no lleva título'], correct:0, explain:' La portada de estudiante omite el titulillo; la profesional sí lo incluye.'},
+  {q:'¿Cuántas palabras suele durar un resumen (abstract) en formato APA?', opts:['50 a 80 palabras','150 a 250 palabras','500 a 700 palabras'], correct:1, explain:' El resumen suele tener entre 150 y 250 palabras, según el destino del documento.'},
+  {q:'¿Qué formato tiene un título de Nivel 1?', opts:['Alineado a la izquierda, sin negrita','Centrado, en negrita, con el texto en un párrafo nuevo','Con sangría y el texto en la misma línea'], correct:1, explain:' El Nivel 1 va centrado, en negrita, y el párrafo comienza en la línea siguiente.'}
+];
+const quizCite = [
+  {q:'"Sánchez (1994) afirma que el planeta es azul (p. 147)" es un ejemplo de:', opts:['Cita parentética','Cita narrativa','Cita secundaria'], correct:1, explain:' Es narrativa: el autor forma parte de la oración y solo el año va entre paréntesis.'},
+  {q:'¿A partir de cuántas palabras una cita textual debe ir en bloque, sangrada y sin comillas?', opts:['20 palabras','40 palabras','100 palabras'], correct:1, explain:' El umbral es 40 palabras: por debajo va entre comillas en el texto; por encima, en bloque.'},
+  {q:'Si un trabajo tiene tres o más autores, ¿qué debes usar desde la primera cita?', opts:['Todos los apellidos siempre','"et al." después del primer apellido','Solo el apellido del autor principal, sin fecha'], correct:1, explain:' Desde la 7ª edición, "et al." se usa desde la primera cita cuando hay tres o más autores, si no genera ambigüedad.'},
+  {q:'Citaste a Ayala (1983) porque lo mencionó Sánchez (2009), pero no leíste el original de Ayala. ¿Qué entra en tu lista de referencias?', opts:['Ambos autores','Solo Sánchez, porque es la fuente que sí consultaste','Solo Ayala, porque es la fuente original'], correct:1, explain:' En una cita secundaria, solo la fuente que realmente consultaste (Sánchez) va en la lista de referencias.'}
+];
+const quizRef = [
+  {q:'¿Cuáles son los cuatro elementos básicos de una referencia APA?', opts:['Autor, fecha, título y fuente de recuperación','Título, editorial, país y precio','Autor, prólogo, edición e ISBN'], correct:0, explain:' Toda referencia responde a: Quién (autor), Cuándo (fecha), Qué (título) y Dónde (fuente de recuperación).'},
+  {q:'¿Cómo se ordena la lista de referencias?', opts:['Por orden de aparición en el texto','Alfabéticamente por el apellido del primer autor','Por año de publicación, del más reciente al más antiguo'], correct:1, explain:' El orden es alfabético según el apellido del primer autor de cada entrada.'},
+  {q:'¿Hasta cuántos autores se listan de forma completa en una referencia (7ª edición)?', opts:['Hasta 7','Hasta 20','Todos, sin límite'], correct:1, explain:' La 7ª edición amplió el límite de 7 a 20 autores listados; después de 20, se usan puntos suspensivos antes del último autor.'}
+];
+renderQuiz('quiz-fmt', quizFmt);
+renderQuiz('quiz-struct', quizStruct);
+renderQuiz('quiz-cite', quizCite);
+renderQuiz('quiz-ref', quizRef);
+
+const quizFinal = [
+  {q:'¿Cuál es el sistema de citación que usan las Normas APA?', opts:['Numérico','Autor-Fecha','Nota al pie exclusivamente'], correct:1, explain:' APA usa el sistema Autor-Fecha: apellido del autor y año de publicación.'},
+  {q:'¿Qué tamaño de papel se usa en un documento APA?', opts:['A4 europeo obligatorio','Carta: 21.59 x 27.94 cm','Oficio'], correct:1, explain:' Se usa tamaño Carta (8½ x 11 pulgadas / 21.59 x 27.94 cm).'},
+  {q:'¿Qué sangría llevan las entradas de la lista de referencias?', opts:['Sangría francesa de 1.27 cm','Sangría de primera línea de 2.5 cm','Ninguna sangría'], correct:0, explain:' Las referencias llevan sangría francesa: la primera línea al margen y las siguientes sangradas 1.27 cm.'},
+  {q:'"El crac bancario del 2018 fue por acumulación de riesgos ocultos (Taleb, 2016, pp. 30–31)" es:', opts:['Una cita textual larga','Un parafraseo con cita parentética','Una comunicación personal'], correct:1, explain:' Es un parafraseo: la idea está en palabras propias, pero se acredita con cita parentética.'},
+  {q:'Un correo electrónico que recibiste de un experto, ¿dónde se cita?', opts:['Solo en el texto, como comunicación personal, nunca en referencias','Solo en la lista de referencias','En ambos lugares'], correct:0, explain:' Las comunicaciones personales no se pueden recuperar por el lector, así que solo se citan en el texto.'},
+  {q:'¿Qué formato tiene una cita textual de más de 40 palabras?', opts:['Entre comillas, dentro del párrafo','En bloque, sangrada, sin comillas, a doble espacio','En cursiva, centrada'], correct:1, explain:' Las citas largas van en bloque: sangradas media pulgada, sin comillas, y el punto va antes del paréntesis final.'},
+  {q:'¿Qué formato lleva el título "Referencias" al inicio de la lista bibliográfica?', opts:['Centrado y en negrita','Alineado a la izquierda, subrayado','En minúsculas, entre comillas'], correct:0, explain:' El título "Referencias" va centrado, en negrita, sin comillas ni subrayado.'},
+  {q:'¿Qué elemento distingue a una cita narrativa de una parentética?', opts:['La narrativa nunca lleva número de página','En la narrativa, el autor forma parte de la oración; en la parentética va todo entre paréntesis','No hay diferencia real entre ambas'], correct:1, explain:' En la narrativa el autor se integra a la oración; en la parentética, autor, año y página van entre paréntesis.'},
+  {q:'Según la 7ª edición, ¿qué cambió sobre "et al."?', opts:['Ya no se usa nunca','Se usa desde la primera cita con 3 o más autores','Solo se usa si hay más de 10 autores'], correct:1, explain:' Antes se usaba desde la segunda cita con 3–5 autores; ahora se usa desde la primera cita con 3 o más autores.'},
+  {q:'¿Qué formato lleva el interlineado en un documento APA?', opts:['Sencillo en todo el texto','Doble en todo el documento, incluida la lista de referencias','1.5 solo en el resumen'], correct:1, explain:' El interlineado doble se aplica de forma consistente: cuerpo, resumen, citas en bloque, títulos y referencias.'}
+];
+
+let finalScore = 0;
+function initFinal(){
+  finalScore = 0;
+  document.getElementById('scoreBar').style.display = 'none';
+  renderQuiz('quiz-final', quizFinal, {
+    onAllAnswered:(score)=>{
+      finalScore = score;
+      document.getElementById('scoreN').textContent = `${score} / ${quizFinal.length}`;
+      document.getElementById('scoreBar').style.display = 'flex';
+      visited.add(5);
+      buildRail(); updateProgress(); saveProgress();
+    }
+  });
+}
+function resetFinal(){ initFinal(); window.scrollTo({top:document.querySelector('[data-page="5"]').offsetTop-90,behavior:'smooth'}); }
+initFinal();
+
+/* ---------------- init ---------------- */
+loadProgress();
+buildRail();
+updateProgress();
+goPage(0);
+</script>
+</body>
+</html>
