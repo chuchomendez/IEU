@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fichero de citas APA 7</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper:#ECE8DE;
+    --card:#F7F4EC;
+    --ink:#211D17;
+    --ink-soft:#5B564A;
+    --rule:#C8C0AC;
+    --stamp:#7B2E2E;
+    --stamp-soft:#7B2E2E1a;
+    --teal:#33635B;
+    --teal-soft:#33635B1a;
+    padding-top:env(safe-area-inset-top,0px);
+    padding-bottom:env(safe-area-inset-bottom,0px);
+  }
+  :root:not([data-theme="light"]){ }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#1C1A15; --card:#242019; --ink:#EDE8DA; --ink-soft:#B3ADA0;
+      --rule:#443F33; --stamp:#D98686; --stamp-soft:#D986861a; --teal:#7FC2B6; --teal-soft:#7FC2B61a;
+    }
+  }
+  :root[data-theme="dark"]{
+    --paper:#1C1A15; --card:#242019; --ink:#EDE8DA; --ink-soft:#B3ADA0;
+    --rule:#443F33; --stamp:#D98686; --stamp-soft:#D986861a; --teal:#7FC2B6; --teal-soft:#7FC2B61a;
+  }
+  html{scroll-padding-top:env(safe-area-inset-top,0px)}
+  *{box-sizing:border-box}
+  body{
+    margin:0; background:var(--paper); color:var(--ink);
+    font-family:'Source Serif 4', Georgia, 'Times New Roman', serif;
+    line-height:1.5;
+  }
+  .mono{font-family:'IBM Plex Mono', ui-monospace, Menlo, Consolas, monospace;}
+
+  header{
+    padding:2.2rem 1.5rem 1.4rem;
+    max-width:1040px; margin:0 auto;
+  }
+  header h1{
+    font-size:clamp(1.6rem,4vw,2.3rem); margin:0 0 .3rem; font-weight:700;
+    letter-spacing:-0.01em;
+  }
+  header p{margin:0; color:var(--ink-soft); font-size:1rem; max-width:60ch;}
+
+  .layout{
+    max-width:1040px; margin:0 auto; padding:0 1.5rem 3rem;
+    display:grid; grid-template-columns:230px 1fr; gap:1.6rem;
+  }
+  @media (max-width:760px){
+    .layout{grid-template-columns:1fr;}
+  }
+
+  nav.index{
+    position:sticky; top:1rem; align-self:start;
+    border-right:1px solid var(--rule);
+    padding-right:1rem;
+  }
+  @media (max-width:760px){
+    nav.index{
+      position:static; border-right:none; border-bottom:1px solid var(--rule);
+      padding:0 0 1rem 0; overflow-x:auto; white-space:nowrap;
+    }
+  }
+  nav.index .group-label{
+    font-size:.78rem; color:var(--ink-soft); margin:1.1rem 0 .4rem;
+    font-family:'IBM Plex Mono', monospace;
+  }
+  nav.index .group-label:first-child{margin-top:0;}
+  @media (max-width:760px){
+    nav.index .group-label{display:inline-block; margin:0 .6rem 0 1rem;}
+  }
+  nav.index button{
+    display:block; width:100%; text-align:left; background:none; border:none;
+    color:var(--ink); font-family:inherit; font-size:.95rem; padding:.4rem .1rem;
+    cursor:pointer; border-radius:0; position:relative; line-height:1.3;
+  }
+  @media (max-width:760px){
+    nav.index button{display:inline-block; width:auto; margin-right:.9rem; padding:.3rem .1rem;}
+  }
+  nav.index button::before{
+    content:""; position:absolute; left:-1rem; top:0; bottom:0; width:2px;
+    background:transparent;
+  }
+  @media (max-width:760px){ nav.index button::before{display:none;} }
+  nav.index button.active{color:var(--stamp); font-weight:600;}
+  nav.index button.active::before{background:var(--stamp);}
+  nav.index button:hover{color:var(--stamp);}
+
+  main{min-width:0;}
+
+  .card{
+    background:var(--card); border:1px solid var(--rule);
+    padding:1.6rem 1.7rem; position:relative;
+  }
+  .card::before{
+    content:""; position:absolute; top:0; left:0; right:0; height:4px;
+    background:var(--stamp);
+  }
+  .card h2{
+    margin:.3rem 0 .2rem; font-size:1.35rem; display:flex; align-items:center; gap:.6rem;
+  }
+  .tag{
+    font-family:'IBM Plex Mono', monospace; font-size:.68rem; letter-spacing:.03em;
+    color:var(--stamp); border:1px solid var(--stamp); padding:.1rem .45rem;
+  }
+  .card > p.lead{color:var(--ink-soft); margin:.2rem 0 1.1rem; font-size:1rem;}
+
+  .block{margin-top:1.1rem;}
+  .block h3{
+    font-family:'IBM Plex Mono', monospace; font-size:.72rem; letter-spacing:.03em;
+    color:var(--ink-soft); margin:0 0 .4rem; font-weight:600;
+  }
+  .example{
+    background:var(--teal-soft); border-left:3px solid var(--teal);
+    padding:.85rem 1rem; font-family:'IBM Plex Mono', monospace; font-size:.88rem;
+    line-height:1.6; white-space:pre-wrap;
+  }
+  .reference{
+    font-family:'IBM Plex Mono', monospace; font-size:.85rem; line-height:1.6;
+    padding:.85rem 1rem; background:var(--stamp-soft); border-left:3px solid var(--stamp);
+    text-indent:-1.2em; margin-left:1.2em;
+  }
+  .note{font-size:.88rem; color:var(--ink-soft); margin-top:.6rem;}
+
+  .rule-note{
+    margin-top:2.2rem; padding:1rem 1.2rem; border:1px dashed var(--rule);
+    font-size:.95rem;
+  }
+  .rule-note b{color:var(--stamp);}
+
+  table.compare{
+    width:100%; border-collapse:collapse; margin-top:2rem; font-size:.9rem;
+    overflow-x:auto; display:block;
+  }
+  table.compare th, table.compare td{
+    border-bottom:1px solid var(--rule); text-align:left; padding:.6rem .5rem;
+    vertical-align:top;
+  }
+  table.compare th{
+    font-family:'IBM Plex Mono', monospace; font-size:.7rem; color:var(--ink-soft);
+    font-weight:600; letter-spacing:.02em;
+  }
+  table.compare td.ex{font-family:'IBM Plex Mono', monospace; font-size:.82rem;}
+
+  section.quiz{margin-top:2.4rem;}
+  section.quiz h2{font-size:1.2rem; margin-bottom:.3rem;}
+  section.quiz > p{color:var(--ink-soft); margin-top:0; font-size:.92rem;}
+  .quiz-card{
+    background:var(--card); border:1px solid var(--rule); padding:1.3rem 1.4rem; margin-top:.9rem;
+  }
+  .quiz-example{
+    font-family:'IBM Plex Mono', monospace; font-size:.9rem; background:var(--paper);
+    padding:.8rem 1rem; border-left:3px solid var(--rule); margin-bottom:1rem; white-space:pre-wrap;
+  }
+  .quiz-options{display:flex; flex-wrap:wrap; gap:.5rem;}
+  .quiz-options button{
+    font-family:inherit; font-size:.88rem; padding:.5rem .8rem; background:var(--paper);
+    border:1px solid var(--rule); color:var(--ink); cursor:pointer;
+  }
+  .quiz-options button:hover{border-color:var(--stamp);}
+  .quiz-options button.correct{background:var(--teal-soft); border-color:var(--teal); color:var(--teal); font-weight:600;}
+  .quiz-options button.wrong{background:var(--stamp-soft); border-color:var(--stamp); color:var(--stamp); font-weight:600;}
+  .quiz-feedback{margin-top:.8rem; font-size:.88rem; min-height:1.3em; color:var(--ink-soft);}
+  .quiz-nav{margin-top:1rem; display:flex; gap:.6rem; align-items:center;}
+  .quiz-nav button{
+    font-family:'IBM Plex Mono', monospace; font-size:.78rem; background:none;
+    border:1px solid var(--ink); color:var(--ink); padding:.4rem .8rem; cursor:pointer;
+  }
+  .quiz-score{font-family:'IBM Plex Mono', monospace; font-size:.8rem; color:var(--ink-soft);}
+
+  footer{max-width:1040px; margin:0 auto; padding:1rem 1.5rem 2.5rem; color:var(--ink-soft); font-size:.8rem;}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Fichero de citas y referencias — APA 7</h1>
+  <p>Guía de consulta rápida: cinco formas de citar dentro del texto y seis formatos de referencia para la lista final. Elige una entrada del fichero.</p>
+</header>
+
+<div class="layout">
+  <nav class="index" id="index">
+    <div class="group-label">Citas en el texto</div>
+    <button data-target="narrativa" class="active">Cita narrativa</button>
+    <button data-target="parentetica">Cita parentética</button>
+    <button data-target="textual-corta">Cita textual corta</button>
+    <button data-target="textual-larga">Cita textual larga</button>
+    <button data-target="parafrasis">Paráfrasis</button>
+    <div class="group-label">Referencias</div>
+    <button data-target="libro">Libro</button>
+    <button data-target="capitulo">Capítulo de libro</button>
+    <button data-target="articulo">Artículo científico</button>
+    <button data-target="web">Página web</button>
+    <button data-target="organizacion">Organización como autor</button>
+    <button data-target="tesis">Tesis</button>
+  </nav>
+
+  <main>
+    <div class="card" id="cardhost"></div>
+
+    <div class="rule-note">
+      Regla para recordarles: la <b>cita</b> va dentro del texto; la <b>referencia</b> va al final del trabajo, en la lista de referencias.
+    </div>
+
+    <table class="compare">
+      <tr><th>Elemento</th><th>¿Dónde aparece?</th><th>Ejemplo</th></tr>
+      <tr><td>Cita</td><td>Dentro del trabajo</td><td class="ex">(Hernández-Sampieri &amp; Mendoza, 2018)</td></tr>
+      <tr><td>Cita narrativa</td><td>Dentro de la redacción</td><td class="ex">Hernández-Sampieri y Mendoza (2018)</td></tr>
+      <tr><td>Cita textual</td><td>Reproduce palabras del autor</td><td class="ex">"..." (Autor, año, p. 10)</td></tr>
+      <tr><td>Paráfrasis</td><td>Explica la idea con palabras propias</td><td class="ex">(Autor, año)</td></tr>
+      <tr><td>Referencia</td><td>Al final del trabajo</td><td class="ex">Hernández-Sampieri, R., &amp; Mendoza, C. P. (2018)…</td></tr>
+      <tr><td>Lista de referencias</td><td>Sección final</td><td class="ex">Contiene las fuentes citadas en el texto</td></tr>
+    </table>
+
+    <section class="quiz" id="quiz">
+      <h2>Practica: ¿qué tipo de cita es?</h2>
+      <p>Lee el ejemplo y elige la categoría correcta.</p>
+      <div class="quiz-card">
+        <div class="quiz-example" id="qtext"></div>
+        <div class="quiz-options" id="qoptions"></div>
+        <div class="quiz-feedback" id="qfeedback"></div>
+        <div class="quiz-nav">
+          <button id="qnext">Siguiente →</button>
+          <span class="quiz-score" id="qscore">0 / 0</span>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<footer>Material de apoyo de clase — Normas APA 7.ª edición.</footer>
+
+<script>
+const entries = {
+  "narrativa": {
+    tag:"Cita en el texto", title:"Cita narrativa",
+    lead:"El autor forma parte de la redacción y el año va entre paréntesis.",
+    example:"De acuerdo con Hernández-Sampieri y Mendoza (2018), la investigación permite generar conocimiento mediante un proceso sistemático.",
+    reference:"Hernández-Sampieri, R., & Mendoza, C. P. (2018). Metodología de la investigación: Las rutas cuantitativa, cualitativa y mixta. McGraw-Hill Education."
+  },
+  "parentetica": {
+    tag:"Cita en el texto", title:"Cita parentética",
+    lead:"El autor y el año aparecen entre paréntesis al final de la idea.",
+    example:"La investigación requiere un proceso sistemático para generar conocimiento confiable (Hernández-Sampieri & Mendoza, 2018).",
+    reference:"Hernández-Sampieri, R., & Mendoza, C. P. (2018). Metodología de la investigación: Las rutas cuantitativa, cualitativa y mixta. McGraw-Hill Education."
+  },
+  "textual-corta": {
+    tag:"Cita en el texto", title:"Cita textual corta",
+    lead:"Se usa cuando se reproducen menos de 40 palabras del autor, entre comillas.",
+    example:"La investigación científica constituye \u201cun conjunto de procesos sistemáticos, críticos y empíricos que se aplican al estudio de un fenómeno\u201d (Hernández-Sampieri & Mendoza, 2018, p. 4).",
+    reference:"Hernández-Sampieri, R., & Mendoza, C. P. (2018). Metodología de la investigación: Las rutas cuantitativa, cualitativa y mixta. McGraw-Hill Education."
+  },
+  "textual-larga": {
+    tag:"Cita en el texto", title:"Cita textual larga",
+    lead:"Con 40 palabras o más: se presenta en bloque, sin comillas y con sangría.",
+    example:"Hernández-Sampieri y Mendoza (2018) explican:\n\n    La investigación es un conjunto de procesos sistemáticos, críticos\n    y empíricos que se aplican al estudio de un fenómeno o problema\n    con el resultado de ampliar su conocimiento. (p. 4)",
+    reference:"Hernández-Sampieri, R., & Mendoza, C. P. (2018). Metodología de la investigación: Las rutas cuantitativa, cualitativa y mixta. McGraw-Hill Education.",
+    note:"En un documento real, el bloque conserva la sangría correspondiente y se indica la página."
+  },
+  "parafrasis": {
+    tag:"Cita en el texto", title:"Paráfrasis",
+    lead:"El estudiante explica con sus propias palabras la idea del autor.",
+    example:"La investigación científica implica desarrollar un proceso organizado y sistemático que permita estudiar un fenómeno y generar conocimiento (Hernández-Sampieri & Mendoza, 2018).",
+    reference:"Hernández-Sampieri, R., & Mendoza, C. P. (2018). Metodología de la investigación: Las rutas cuantitativa, cualitativa y mixta. McGraw-Hill Education.",
+    note:"Aquí no es obligatorio colocar la página, aunque puede añadirse para facilitar la localización de la información."
+  },
+  "libro": {
+    tag:"Formato de referencia", title:"Libro",
+    lead:"Formato: Apellido, Inicial. (Año). Título del libro. Editorial.",
+    example:"Hernández-Sampieri, R., & Mendoza, C. P. (2018). Metodología de la investigación: Las rutas cuantitativa, cualitativa y mixta. McGraw-Hill Education."
+  },
+  "capitulo": {
+    tag:"Formato de referencia", title:"Capítulo de libro",
+    lead:"Formato general para un capítulo dentro de un libro editado.",
+    example:"Apellido, Inicial. (Año). Título del capítulo. En Inicial. Apellido (Ed.), Título del libro (pp. xx-xx). Editorial."
+  },
+  "articulo": {
+    tag:"Formato de referencia", title:"Artículo científico",
+    lead:"Formato: Apellido, Inicial., & Apellido, Inicial. (Año). Título del artículo. Nombre de la Revista, volumen(número), páginas. DOI/URL",
+    example:"García, J. A., & López, M. R. (2023). Competencias digitales en estudiantes universitarios. Revista de Educación y Tecnología, 15(2), 45–60. https://doi.org/xxxxx"
+  },
+  "web": {
+    tag:"Formato de referencia", title:"Página web",
+    lead:"Formato: Autor/Organización. (Año, día de mes). Título de la página. Sitio web. URL",
+    example:"Organización de las Naciones Unidas. (2024, 15 de mayo). Educación para el desarrollo sostenible. Naciones Unidas. URL",
+    note:"Cuando el autor y el nombre del sitio son iguales, en APA 7 normalmente no se repite el nombre del sitio."
+  },
+  "organizacion": {
+    tag:"Formato de referencia", title:"Organización como autor",
+    lead:"La organización funciona como autor de la referencia.",
+    example:"Organización Mundial de la Salud. (2023). Título del documento. URL",
+    note:"La primera cita puede usar el nombre completo con abreviatura: (Organización Mundial de la Salud [OMS], 2023). Después: (OMS, 2023)."
+  },
+  "tesis": {
+    tag:"Formato de referencia", title:"Tesis",
+    lead:"Formato: Apellido, Inicial. (Año). Título de la tesis [Tesis de maestría/doctoral, Nombre de la institución]. Repositorio/URL",
+    example:"Apellido, Inicial. (Año). Título de la tesis [Tesis de maestría, Universidad Autónoma de Ejemplo]. Repositorio institucional. URL"
+  }
+};
+
+const host = document.getElementById('cardhost');
+const buttons = document.querySelectorAll('nav.index button');
+
+function render(key){
+  const e = entries[key];
+  const isRef = e.tag.startsWith("Formato");
+  host.innerHTML = `
+    <h2><span class="tag">${e.tag}</span> ${e.title}</h2>
+    <p class="lead">${e.lead}</p>
+    <div class="block">
+      <h3>Ejemplo</h3>
+      <div class="${isRef ? 'reference' : 'example'}">${e.example}</div>
+    </div>
+    ${!isRef ? `<div class="block"><h3>Referencia completa</h3><div class="reference">${e.reference}</div></div>` : ''}
+    ${e.note ? `<p class="note">${e.note}</p>` : ''}
+  `;
+  buttons.forEach(b => b.classList.toggle('active', b.dataset.target === key));
+}
+
+buttons.forEach(b => b.addEventListener('click', () => render(b.dataset.target)));
+render('narrativa');
+
+// --- Quiz ---
+const quizItems = [
+  {text:"Según García (2023), la tecnología transforma los procesos educativos.", answer:"Narrativa"},
+  {text:"(García, 2023)", answer:"Parentética"},
+  {text:"\u201cLa tecnología transforma los procesos educativos\u201d (García, 2023, p. 12).", answer:"Textual corta"},
+  {text:"La tecnología ha cambiado la forma en que los estudiantes aprenden y se relacionan con el conocimiento (García, 2023).", answer:"Paráfrasis"},
+  {text:"López (2020) señala:\n\n   Un párrafo de cuarenta palabras o más se debe presentar en bloque,\n   sin comillas, con sangría, indicando siempre el número de página\n   correspondiente al final de la idea citada textualmente. (p. 8)", answer:"Textual larga"}
+];
+const options = ["Narrativa","Parentética","Textual corta","Textual larga","Paráfrasis"];
+let qi = 0, score = 0, answered = 0;
+
+function loadQuiz(){
+  const item = quizItems[qi];
+  document.getElementById('qtext').textContent = item.text;
+  const opt = document.getElementById('qoptions');
+  opt.innerHTML = '';
+  document.getElementById('qfeedback').textContent = '';
+  options.forEach(o => {
+    const btn = document.createElement('button');
+    btn.textContent = o;
+    btn.addEventListener('click', () => checkAnswer(btn, item.answer));
+    opt.appendChild(btn);
+  });
+}
+
+function checkAnswer(btn, correctAnswer){
+  const opt = document.getElementById('qoptions');
+  if(opt.dataset.locked) return;
+  opt.dataset.locked = "1";
+  const isCorrect = btn.textContent === correctAnswer;
+  btn.classList.add(isCorrect ? 'correct' : 'wrong');
+  [...opt.children].forEach(b => {
+    if(b.textContent === correctAnswer) b.classList.add('correct');
+  });
+  document.getElementById('qfeedback').textContent = isCorrect
+    ? "Correcto." : `No exactamente — es ${correctAnswer}.`;
+  score += isCorrect ? 1 : 0;
+  answered += 1;
+  document.getElementById('qscore').textContent = `${score} / ${answered}`;
+}
+
+document.getElementById('qnext').addEventListener('click', () => {
+  qi = (qi + 1) % quizItems.length;
+  document.getElementById('qoptions').dataset.locked = "";
+  loadQuiz();
+});
+
+loadQuiz();
+</script>
+</body>
+</html>
